@@ -40,16 +40,16 @@ bool SolarSystem::startup() {
 		.3f		//	Neptune
 	};
 
-	glm::vec3 planetPos[PLANET_NUM] =
+	float distFromSun[PLANET_NUM] =
 	{
-		vec3(1.4f,0,0),	//	Mercury
-		vec3(.5f,0,0),	//	Venus
-		vec3(0),	//	Earth
-		vec3(0),	//	Mars
-		vec3(0),	//	Jupiter
-		vec3(0),	//	Saturn
-		vec3(0),	//	Uranus
-		vec3(0)		//	Neptune
+		1.4f,	//	Mercury
+		2.5f,	//	Venus
+		0,		//	Earth
+		0,		//	Mars
+		0,		//	Jupiter
+		0,		//	Saturn
+		0,		//	Uranus
+		0		//	Neptune
 	};
 
 	glm::vec4 planetColours [PLANET_NUM] =
@@ -66,7 +66,7 @@ bool SolarSystem::startup() {
 
 	for (int i = 0; i < PLANET_NUM; i++)
 	{
-		m_planets.push_back(new Planetoid(glm::vec3(0), planetSizes[i],planetColours[i]));
+		m_planets.push_back(new Planetoid(glm::vec3(0), distFromSun[i], planetSizes[i], planetColours[i]));
 	}
 
 	return true;
@@ -99,9 +99,9 @@ void SolarSystem::update(float deltaTime) {
 
 	Gizmos::addSphere(glm::vec3(0), 1, 15, 15, glm::vec4(1, 0, 0, 0.5f));
 
-	for (int i = 0; i < m_planets.size(); i++)
+	for (int i = 0; i < 1; i++)
 	{
-		m_planets[i]->RotatePlanetAround(getTime(), 1.5f,i);
+		m_planets[i]->RotatePlanetAround(getTime(), 1.5f,1,glm::vec3(0,1,0));
 		m_planets[i]->Draw();
 	}
 	
