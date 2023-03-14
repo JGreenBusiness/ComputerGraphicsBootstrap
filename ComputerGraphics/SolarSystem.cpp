@@ -28,7 +28,7 @@ bool SolarSystem::startup() {
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 	const int PLANET_NUM = 8;
-	float m_planetSizes [PLANET_NUM] =
+	float planetSizes [PLANET_NUM] =
 	{
 		.2f,	//	Mercury
 		.32f,	//	Venus
@@ -40,7 +40,7 @@ bool SolarSystem::startup() {
 		.3f		//	Neptune
 	};
 
-	glm::vec3 m_planetPos[PLANET_NUM] =
+	glm::vec3 planetPos[PLANET_NUM] =
 	{
 		vec3(1.4f,0,0),	//	Mercury
 		vec3(.5f,0,0),	//	Venus
@@ -52,7 +52,7 @@ bool SolarSystem::startup() {
 		vec3(0)		//	Neptune
 	};
 
-	glm::vec4 m_planetColours [PLANET_NUM] =
+	glm::vec4 planetColours [PLANET_NUM] =
 	{
 		glm::vec4(1, 0.93f, 0.73f,1),	//	Mercury
 		glm::vec4(1, 0.78f, 0.19f,1),	//	Venus
@@ -64,7 +64,10 @@ bool SolarSystem::startup() {
 		glm::vec4(0.34f, 0.6f, 1,1)	//	Neptune
 	};
 
-	m_planets.push_back(new Planetoid(glm::vec3(0), m_planetSizes[0]));
+	for (int i = 0; i < PLANET_NUM; i++)
+	{
+		m_planets.push_back(new Planetoid(glm::vec3(0), planetSizes[i],planetColours[i]));
+	}
 
 	return true;
 }
@@ -96,8 +99,11 @@ void SolarSystem::update(float deltaTime) {
 
 	Gizmos::addSphere(glm::vec3(0), 1, 15, 15, glm::vec4(1, 0, 0, 0.5f));
 
-	m_planets[0]->Draw();
-	m_planets[0]->RotatePlanetAround(getTime(),1.5f);
+	for (int i = 0; i < m_planets.size(); i++)
+	{
+		m_planets[i]->RotatePlanetAround(getTime(), 1.5f,i);
+		m_planets[i]->Draw();
+	}
 	
 
 	// quit if we press escape
