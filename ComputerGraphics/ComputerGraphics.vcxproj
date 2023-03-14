@@ -173,6 +173,7 @@
     <ClCompile Include="Planetoid.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SolarSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComputerGraphicsApp.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="Planetoid.h" />
     <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SolarSystem.h" />
     <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

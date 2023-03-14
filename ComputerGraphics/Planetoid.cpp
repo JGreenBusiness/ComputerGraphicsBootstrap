@@ -4,29 +4,27 @@
 Planetoid::Planetoid(glm::vec3 _pos, float _radius)
 {
 	m_origin = _pos;
-
+	m_radius = _radius;
+	m_transform = new glm::mat4(1);
 }
 
 Planetoid::~Planetoid()
 {
-
+	delete m_transform;
 }
 
 void Planetoid::Update(float _dt)
 {
-
-	//aie::Gizmos::addSphere(glm::vec3(0), 1, 15, 15, glm::vec4(1, 0, 0, 0.5f));
-
-
-	//glm::mat4 mercury = glm::mat4(1);
-
-	//float time = aie::getTime();
-	//mercury = glm::translate(mercury, glm::vec3(glm::sin(time * 1.0f), 0, glm::cos(time * 1.0f)));
-
-	//aie::Gizmos::addSphere(glm::vec3(0), .5, 12, 12, glm::vec4(1), &mercury);
+	
 }
 
 void Planetoid::Draw()
 {
-	aie::Gizmos::addSphere(glm::vec3(0), m_size, 15, 15, glm::vec4(1, 0, 0, 0.5f),&*transform);
+	aie::Gizmos::addSphere(m_origin, m_radius, 15, 15, glm::vec4(1, 0, 0, 0.5f),&*m_transform);
+	m_transform = new glm::mat4(1);
+}
+
+void Planetoid::RotatePlanetAround(float _time,float _speed)
+{
+	*m_transform = glm::translate(*m_transform, glm::vec3(glm::sin(_time * _speed), 0, glm::cos(_time * _speed)));
 }

@@ -12,11 +12,14 @@ public:
 	void Update(float _dt);
 	void Draw();
 
-	void SetTransform(glm::mat4* _mat) { transform = _mat; };
-	glm::mat4* GetTransform() { return transform; }
+	void SetTransform(glm::mat4* _mat) { m_transform = _mat; };
+	glm::mat4* GetTransform() { return m_transform; }
+
+	void RotatePlanetAround(float _time, float _speed);
 
 protected:
-	float m_size;
+	float m_radius;
 	glm::vec3 m_origin;
-	glm::mat4* transform;
+	glm::mat4* m_transform;
+
 };
