@@ -16,6 +16,9 @@
     <Filter Include="Header Files\Provided">
       <UniqueIdentifier>{5006f503-58f2-4167-97f1-7dd6924de9b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Provided">
+      <UniqueIdentifier>{cf0e1fa7-2df4-4d86-8e3b-964edf84e1b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,6 +30,18 @@
     <ClCompile Include="Planetoid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTarget.cpp">
+      <Filter>Source Files\Provided</Filter>
+    </ClCompile>
+    <ClCompile Include="OBJMesh.cpp">
+      <Filter>Source Files\Provided</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Provided</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComputerGraphicsApp.h">
@@ -34,6 +49,21 @@
     </ClInclude>
     <ClInclude Include="Planetoid.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJMesh.h">
+      <Filter>Header Files\Provided</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTarget.h">
+      <Filter>Header Files\Provided</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files\Provided</Filter>
+    </ClInclude>
+    <ClInclude Include="tiny_obj_loader.h">
+      <Filter>Header Files\Provided</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

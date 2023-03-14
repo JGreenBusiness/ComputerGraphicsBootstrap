@@ -27,7 +27,7 @@ bool ComputerGraphicsApp::startup() {
 	m_viewMatrix = glm::lookAt(vec3(15), vec3(0), vec3(0, 1, 0));
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
-	return true;
+	return LaunchShaders();
 }
 
 void ComputerGraphicsApp::shutdown() {
@@ -71,5 +71,45 @@ void ComputerGraphicsApp::draw() {
 	// update perspective based on screen size
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
+#pragma region SimpleShader
+	// Bind the Shader
+	m_simpleShader.bind();
+
+	//Bind the transform
+
+	auto pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
+	m_simpleShader.bindUniform("ProjectionViewModel", pvm);
+
+	// Draw the quad using mesh's draw
+	m_quadMesh.Draw();
+#pragma endregion
+
+
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
+}
+
+bool ComputerGraphicsApp::LaunchShaders()
+{
+	m_simpleShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
+	m_simpleShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
+
+	if (m_simpleShader.link() == false)
+	{
+		printf("Simple Shader has an Error: %s\n", m_simpleShader.getLastError());
+		return false;
+	}
+
+	m_quadMesh.InitialiseQuad();
+
+	// This is a 10 'unit' wide quad
+	m_quadTransform =
+	{
+		10,0,0,0,
+		0,10,0,0,
+		0,0,10,0,
+		0,0,0,1
+	};
+
+
+	return true;
 }
