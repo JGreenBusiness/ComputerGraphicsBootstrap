@@ -16,7 +16,7 @@ public:
 	glm::mat4* GetTransform() { return m_transform; }
 	float GetRadius() { return m_radius; }
 
-	void RotatePlanetAround(float _time, float _speed, float _dist, const glm::vec3& _axis);
+	void DrawOrbitingPlanet(float _time, float _speed, const glm::vec3& _axis);
 	glm::mat4 RotAroundPoint(float rad, const glm::vec3& point, const glm::vec3& axis);
 
 protected:

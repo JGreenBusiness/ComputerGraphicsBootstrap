@@ -23,12 +23,10 @@ void Planetoid::Update(float _dt)
 
 void Planetoid::Draw()
 {
-	m_origin -= glm::vec3(1, 0, 0);
-	aie::Gizmos::addSphere(m_origin, m_radius, 15, 15, m_colour,&*m_transform);
-	m_origin += glm::vec3(1, 0, 0);
+	
 }
 
-void Planetoid::RotatePlanetAround(float _time, float _speed,float _dist, const glm::vec3& _axis)
+void Planetoid::DrawOrbitingPlanet(float _time, float _speed, const glm::vec3& _axis)
 {
 	glm::mat4 mat = *m_transform;
 
@@ -41,8 +39,12 @@ void Planetoid::RotatePlanetAround(float _time, float _speed,float _dist, const 
 
 	
 
-	mat = RotAroundPoint(_time * _speed, glm::vec3(_dist,0,0), _axis);
+	mat = RotAroundPoint(_time * _speed, glm::vec3(m_distFromSun,0,0), _axis);
 	*m_transform = mat;
+
+	m_origin -= glm::vec3(m_distFromSun, 0, 0);
+	aie::Gizmos::addSphere(m_origin, m_radius, 15, 15, m_colour, &*m_transform);
+	m_origin += glm::vec3(m_distFromSun, 0, 0);
 
 }
 
