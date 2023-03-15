@@ -42,9 +42,9 @@ void Planetoid::DrawOrbitingPlanet(float _time, float _speed, const glm::vec3& _
 	mat = RotAroundPoint(_time * _speed, glm::vec3(m_distFromSun,0,0), _axis);
 	*m_transform = mat;
 
-	m_origin -= glm::vec3(m_distFromSun, 0, 0);
+	//m_origin -= glm::vec3(m_distFromSun, 0, 0);
 	aie::Gizmos::addSphere(m_origin, m_radius, 15, 15, m_colour, &*m_transform);
-	m_origin += glm::vec3(m_distFromSun, 0, 0);
+	//m_origin += glm::vec3(m_distFromSun, 0, 0);
 
 }
 

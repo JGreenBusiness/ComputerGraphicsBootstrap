@@ -9,9 +9,9 @@ out vec4 FragColour;
 uniform vec3 CameraPosition;
 
 // Model Data
-uniform vec3 Ka; // The ambient material colour
-uniform vec3 Kd; // The diffuse material colour
-uniform vec3 Ks; // The specular material colour
+uniform vec3 Ka;  // The ambient material colour
+uniform vec3 Kd;  // The diffuse material colour
+uniform vec3 Ks;  // The specular material colour
 uniform float Ns; // The Specular power of Ks
 
 // Light Data

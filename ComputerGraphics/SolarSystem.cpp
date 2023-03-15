@@ -51,6 +51,8 @@ bool SolarSystem::startup() {
 		6,		//	Uranus
 		6.9		//	Neptune
 	};
+	
+	
 
 	glm::vec4 planetColours [PLANET_NUM] =
 	{
@@ -99,9 +101,21 @@ void SolarSystem::update(float deltaTime) {
 
 	Gizmos::addSphere(glm::vec3(0), 1, 15, 15, glm::vec4(1, 0, 0, 0.5f));
 
+	float planetSpeed[8] =
+	{
+		.4f,	//	Mercury
+		.5f,	//	Venus
+		.1f,	//	Earth
+		.5f,	//	Mars
+		.8f,	//	Jupiter
+		.1f,	//	Saturn
+		.2f,	//	Uranus
+		.9f		//	Neptune
+	};
+
 	for (int i = 0; i < 8; i++)
 	{
-		m_planets[i]->DrawOrbitingPlanet(getTime(), 1.5f,glm::vec3(0,1,0));
+		m_planets[i]->DrawOrbitingPlanet(getTime()*planetSpeed[i], 1.5f, glm::vec3(0, 1, 0));
 	}
 	
 
