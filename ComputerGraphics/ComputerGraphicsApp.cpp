@@ -1,6 +1,7 @@
 #include "ComputerGraphicsApp.h"
 #include "Gizmos.h"
 #include "Input.h"
+#include "imgui.h"
 
 
 using glm::vec3;
@@ -26,6 +27,9 @@ bool ComputerGraphicsApp::startup() {
 	// create simple camera transforms
 	m_viewMatrix = glm::lookAt(vec3(15), vec3(0), vec3(0, 1, 0));
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
+
+	m_light.colour = { 1,1,0 };
+	m_ambientLight = { .5f,.5f,.5f };
 
 	return LaunchShaders();
 }
@@ -59,8 +63,20 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
+	// Grab the time since the application has started
+	float time = getTime();
+
+	// Rotate the light to emulate a 'day/night' cycle
+	m_light.direction = 
+		glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2),0));
+
+	
+
+
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
+	
+	ImGUIRefresher();
 }
 
 void ComputerGraphicsApp::draw() {
@@ -77,7 +93,9 @@ void ComputerGraphicsApp::draw() {
 	QuadDraw(pv * m_quadTransform);
 
 	//Draw the bunny up in BunnyLoader
-	BunnyDraw(pv * m_bunnyTransform);
+	//BunnyDraw(pv * m_bunnyTransform);
+
+	PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 }
@@ -99,6 +117,16 @@ bool ComputerGraphicsApp::LaunchShaders()
 
 	return true;
 }
+
+void ComputerGraphicsApp::ImGUIRefresher()
+{
+	ImGui::Begin("Light Settings");
+	ImGui::DragFloat3("Global Light Colour", 
+		&m_light.colour[0],0.1f,0,1);
+	ImGui::DragFloat3("Glabal Light Direction",
+		&m_light.direction[0],0.1f, 01,1);
+	ImGui::End();
+;}
 
 bool ComputerGraphicsApp::QuadLoader()
 {
@@ -152,13 +180,13 @@ void ComputerGraphicsApp::QuadDraw(glm::mat4 pvm)
 
 bool ComputerGraphicsApp::BunnyLoader()
 {
-	m_colourShader.loadShader(aie::eShaderStage::VERTEX,
-		"./shaders/colour.vert");
-	m_colourShader.loadShader(aie::eShaderStage::FRAGMENT,
-		"./shaders/colour.frag");
-	if (m_colourShader.link() == false)
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/Phong.vert");
+	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/Phong.frag");
+	if (m_phongShader.link() == false)
 	{
-		printf("Color shader Error: %s\n", m_colourShader.getLastError());
+		printf("Color shader Error: %s\n", m_phongShader.getLastError());
 		return false;
 	}
 	if (m_bunnyMesh.load("./stanford/Bunny.obj") == false)
@@ -183,5 +211,28 @@ void ComputerGraphicsApp::BunnyDraw(glm::mat4 pvm)
 	m_colourShader.bindUniform("ProjectionViewModel", pvm);
 	// Bind the color     
 	m_colourShader.bindUniform("BaseColour", glm::vec4(1));
+	m_bunnyMesh.draw();
+}
+
+void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform)
+{
+	// Bind the phong shader
+	m_phongShader.bind();
+
+	// Bind the camera position
+	m_phongShader.bindUniform("CameraPosition",
+		glm::vec3(glm::inverse(m_viewMatrix)[3]));
+
+	//Bind the direction light we defind
+	m_phongShader.bindUniform("LightDirection", m_light.direction);
+	m_phongShader.bindUniform("AmbientColour", m_ambientLight);
+	m_phongShader.bindUniform("LightColour", m_light.colour);
+
+	// bind the pvm using the one provided
+	m_phongShader.bindUniform("ProjectionViewModel", pvm);
+
+	// bind the transofrm using the one provided
+	m_phongShader.bindUniform("ModelMatrix", transform);
+
 	m_bunnyMesh.draw();
 }

@@ -28,13 +28,21 @@ void Mesh::InitialiseQuad()
 	// Define the 6 vertices for our two triangles to make a quad,
 	// in a counter-clockwise direction
 	Vertex vertices[6];
-	vertices[0].position = { -.5f,.0f,.5f,1.f };
-	vertices[1].position = { .5f,0.f,.5f,1.f };
+	vertices[0].position = { -.5f,0.f, .5f,1.f };
+	vertices[1].position = {  .5f,0.f, .5f,1.f };
 	vertices[2].position = { -.5f,0.f,-.5f,1.f};
 
 	vertices[3].position = { -.5f,0,-.5f,1.f};
-	vertices[4].position = { .5f,0,.5f,1.f};
-	vertices[5].position = { .5f,0,-.5f,1.f};
+	vertices[4].position = {  .5f,0, .5f,1.f};
+	vertices[5].position = {  .5f,0,-.5f,1.f};
+
+	vertices[0].normal = {0,1,0,0};
+	vertices[1].normal = {0,1,0,0};
+	vertices[2].normal = {0,1,0,0};
+	vertices[3].normal = {0,1,0,0};
+	vertices[4].normal = {0,1,0,0};
+	vertices[5].normal = {0,1,0,0};
+
 
 	// Fill the vertex buffer
 	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(Vertex),
@@ -43,6 +51,10 @@ void Mesh::InitialiseQuad()
 	// Now we will enable the first element as the position
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+	//Enable the second element as the normal
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex),(void*)16);
 
 	// Next we unbind the buffers
 	glBindVertexArray(0);
@@ -75,6 +87,11 @@ void Mesh::Initialise(unsigned int vertexCount, const Vertex* vertices, unsigned
 	// Enable this first element as the position
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+
+	//Enable the second element as the normal
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)16);
 	
 	// Bind the indices if there are any defined
 
