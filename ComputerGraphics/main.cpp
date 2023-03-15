@@ -4,8 +4,8 @@
 int main() {
 	
 	// allocation
-	//auto app = new ComputerGraphicsApp();
-	auto app = new SolarSystem();
+	auto app = new ComputerGraphicsApp();
+	//auto app = new SolarSystem();
 
 	// initialise and loop
 	app->run("AIE", 1280, 720, false);
