@@ -31,8 +31,8 @@ bool ComputerGraphicsApp::startup() {
 	m_light.colour = { 1,1,0 };
 	m_ambientLight = { .5f,.5f,.5f };
 
-	m_boxRot = 0;
-	m_boxRotAxis = glm::vec3(0,1,0);
+	m_shapeRot = 0;
+	m_shapeRotAxis = glm::vec3(0,1,0);
 
 	return LaunchShaders();
 }
@@ -101,14 +101,17 @@ void ComputerGraphicsApp::draw() {
 
 	//PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
 
-	// Draws he Box setup in QuadLoader
 
-	if(m_boxRotAxis != glm::vec3(0))
+	glm::mat4& currentShape = m_cylinderTransform;
+	if(m_shapeRotAxis != glm::vec3(0))
 	{
-		m_boxTransform = glm::rotate(m_boxTransform,glm::radians(m_boxRot),m_boxRotAxis);
+		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
 	}
-
-	BoxDraw(pv * m_boxTransform);
+	// Draws the Box setup in BoxLoader
+	//SimpleDraw(pv * m_boxTransform, m_boxMesh);
+	
+	// Draws the Box setup in BoxLoader
+	SimpleDraw(pv * m_cylinderTransform, m_cylinderMesh);
 
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
@@ -135,6 +138,11 @@ bool ComputerGraphicsApp::LaunchShaders()
 		return false;
 	}
 
+	if (!CylinderLoader())
+	{
+		return false;
+	}
+
 
 	return true;
 }
@@ -147,11 +155,12 @@ void ComputerGraphicsApp::ImGUIRefresher()
 	ImGui::DragFloat3("Glabal Light Direction",
 		&m_light.direction[0],0.1f, 01,1);
 	ImGui::End();
+	
 ImGui::Begin("Box Rot Settings");
 	ImGui::DragFloat3("Box Rot Axis", 
-		&m_boxRotAxis[0],0.0f,0,1);
+		&m_shapeRotAxis[0],0.1f,0,1);
 	ImGui::DragFloat("Box Rot",
-		&m_boxRot,0.1f, -1.0f,360);
+		&m_shapeRot,0.1f, -1.0f,1);
 	ImGui::End();
 
 	
@@ -195,26 +204,16 @@ bool ComputerGraphicsApp::QuadLoader()
 	return true;
 }
 
-void ComputerGraphicsApp::QuadDraw(glm::mat4 pvm)
-{
-	// Bind the Shader
-	m_simpleShader.bind();
-
-	//Bind the transform
-	m_simpleShader.bindUniform("ProjectionViewModel", pvm);
-
-	// Draw the quad using mesh's draw
-	m_quadMesh.Draw();
-}
 
 bool ComputerGraphicsApp::BoxLoader()
 {
-	m_simpleShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
-	m_simpleShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
-
-	if (m_simpleShader.link() == false)
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/Phong.vert");
+	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/Phong.frag");
+	if (m_phongShader.link() == false)
 	{
-		printf("Simple Shader has an Error: %s\n", m_simpleShader.getLastError());
+		printf("Color shader Error: %s\n", m_phongShader.getLastError());
 		return false;
 	}
 
@@ -230,6 +229,15 @@ bool ComputerGraphicsApp::BoxLoader()
 	vertices[5].position = { 0.5f,	1,	0.5f,	1 };
 	vertices[6].position = { -.5f,	1,	0.5f,	1 };
 	vertices[7].position = { -.5f,	1,	-.5f,	1 };
+
+	vertices[0].normal = {0,1,0,0};
+	vertices[1].normal = {0,1,0,0};
+	vertices[2].normal = {0,1,0,0};
+	vertices[3].normal = {0,1,0,0};
+	vertices[4].normal = {0,1,0,0};
+	vertices[5].normal = {0,1,0,0};
+	vertices[6].normal = {0,1,0,0};
+	vertices[7].normal = {0,1,0,0};
 
 	unsigned int indices[36] =
 		{
@@ -255,7 +263,66 @@ bool ComputerGraphicsApp::BoxLoader()
 	return true;
 }
 
-void ComputerGraphicsApp::BoxDraw(glm::mat4 pvm)
+bool ComputerGraphicsApp::CylinderLoader()
+{
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
+	"./shaders/Phong.vert");
+	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/Phong.frag");
+	if (m_phongShader.link() == false)
+	{
+		printf("Color shader Error: %s\n", m_phongShader.getLastError());
+		return false;
+	}
+
+	// Defined as 4 vertices for the 2 triangles
+	Mesh::Vertex vertices[8];
+
+	std::vector<glm::vec4> verts = CreateCircleArray(1,glm::vec3(0),6);
+	for(int i = 0;i < 6; i++)
+	{
+		vertices[i].position = verts[i];
+	}
+
+	unsigned int indices[20] =
+		{
+		0,1,2,2,3,0,
+		4,5,0,0,6,7
+		
+		
+		};
+
+	m_cylinderMesh.Initialise(8, vertices, 20, indices);
+
+	// This is a 10 'unit' wide quad
+	m_cylinderTransform =
+	{
+		10,0,0,0,
+		0,10,0,0,
+		0,0,10,0,
+		0,0,0,1
+	};
+
+	return true;
+}
+
+std::vector<glm::vec4> ComputerGraphicsApp::CreateCircleArray(float radius, glm::vec3 pos, int fragments)
+{
+	const float PI = 3.1415926f;
+
+	std::vector<glm::vec4> result;
+
+	float increment = 2.0f * PI / fragments;
+
+	for (float currAngle = 0.0f; currAngle <= 2.0f * PI; currAngle += increment)
+	{
+		result.push_back(glm::vec4(radius * cos(currAngle) + pos.x, radius * sin(currAngle) + pos.y, pos.z,1));
+	}
+
+	return result;
+}
+
+void ComputerGraphicsApp::SimpleDraw(glm::mat4 pvm, Mesh& mesh)
 {
 	// Bind the Shader
 	m_simpleShader.bind();
@@ -264,7 +331,7 @@ void ComputerGraphicsApp::BoxDraw(glm::mat4 pvm)
 	m_simpleShader.bindUniform("ProjectionViewModel", pvm);
 
 	// Draw the quad using mesh's draw
-	m_boxMesh.Draw();
+	mesh.Draw();
 }
 
 bool ComputerGraphicsApp::BunnyLoader()
@@ -324,4 +391,27 @@ void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform)
 	m_phongShader.bindUniform("ModelMatrix", transform);
 
 	m_bunnyMesh.draw();
+}
+
+void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform, Mesh& mesh)
+{
+	// Bind the phong shader
+	m_phongShader.bind();
+
+	// Bind the camera position
+	m_phongShader.bindUniform("CameraPosition",
+		glm::vec3(glm::inverse(m_viewMatrix)[3]));
+
+	//Bind the direction light we defind
+	m_phongShader.bindUniform("LightDirection", m_light.direction);
+	m_phongShader.bindUniform("AmbientColour", m_ambientLight);
+	m_phongShader.bindUniform("LightColour", m_light.colour);
+
+	// bind the pvm using the one provided
+	m_phongShader.bindUniform("ProjectionViewModel", pvm);
+
+	// bind the transofrm using the one provided
+	m_phongShader.bindUniform("ModelMatrix", transform);
+
+	mesh.Draw();
 }
