@@ -109,6 +109,8 @@ void ComputerGraphicsApp::draw() {
 	}
 
 	BoxDraw(pv * m_boxTransform);
+
+
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 }
 
@@ -229,14 +231,17 @@ bool ComputerGraphicsApp::BoxLoader()
 	vertices[6].position = { -.5f,	1,	0.5f,	1 };
 	vertices[7].position = { -.5f,	1,	-.5f,	1 };
 
-	unsigned int indices[12] =
+	unsigned int indices[36] =
 		{
-		0,1,2,2,1,3,
-		3,4,5,3,5,1,
-		
+		1,0,2,2,3,1,	// Facing -Y
+		3,4,5,3,5,1,	// Facing +X
+		6,0,1,1,5,6,	// Facing -Z
+		6,5,7,7,5,4,	// Facing +Y
+		4,3,2,4,2,7,	// Facing -X
+		7,2,6,2,0,6		// Facing +Z
 		};
 
-	m_boxMesh.Initialise(8, vertices, 12, indices);
+	m_boxMesh.Initialise(8, vertices, 36, indices);
 
 	// This is a 10 'unit' wide quad
 	m_boxTransform =

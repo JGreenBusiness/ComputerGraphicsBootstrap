@@ -9,8 +9,6 @@
     <list default="true" id="26917ead-ef74-45be-962f-2bc4a4100a75" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Bootstrap/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Bootstrap/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ComputerGraphics/ComputerGraphicsApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/ComputerGraphics/ComputerGraphicsApp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ComputerGraphics/ComputerGraphicsApp.h" beforeDir="false" afterPath="$PROJECT_DIR$/ComputerGraphics/ComputerGraphicsApp.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ComputerGraphics/Mesh.h" beforeDir="false" afterPath="$PROJECT_DIR$/ComputerGraphics/Mesh.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/bin/imgui.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -20,6 +18,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.30.30705/include/xmemory" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/dependencies/glm/glm/detail/type_mat4x4.inl" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -191,7 +190,7 @@
       <workItem from="1679037057246" duration="4866000" />
       <workItem from="1679095518126" duration="5315000" />
       <workItem from="1679113198065" duration="3033000" />
-      <workItem from="1679181365342" duration="2767000" />
+      <workItem from="1679181365342" duration="6355000" />
     </task>
     <servers />
   </component>
