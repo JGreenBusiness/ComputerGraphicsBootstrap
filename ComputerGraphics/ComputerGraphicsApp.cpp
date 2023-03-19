@@ -31,6 +31,9 @@ bool ComputerGraphicsApp::startup() {
 	m_light.colour = { 1,1,0 };
 	m_ambientLight = { .5f,.5f,.5f };
 
+	m_boxRot = 0;
+	m_boxRotAxis = glm::vec3(0,1,0);
+
 	return LaunchShaders();
 }
 
@@ -89,16 +92,27 @@ void ComputerGraphicsApp::draw() {
 		getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
 	auto pv = m_projectionMatrix * m_viewMatrix ;
+	
 	// Draws he quad setup in QuadLoader
-	QuadDraw(pv * m_quadTransform);
-
+	//QuadDraw(pv * m_quadTransform);
+		
 	//Draw the bunny up in BunnyLoader
 	//BunnyDraw(pv * m_bunnyTransform);
 
-	PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
+	//PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
 
+	// Draws he Box setup in QuadLoader
+
+	if(m_boxRotAxis != glm::vec3(0))
+	{
+		m_boxTransform = glm::rotate(m_boxTransform,glm::radians(m_boxRot),m_boxRotAxis);
+	}
+
+	BoxDraw(pv * m_boxTransform);
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 }
+
+
 
 bool ComputerGraphicsApp::LaunchShaders()
 {
@@ -110,6 +124,11 @@ bool ComputerGraphicsApp::LaunchShaders()
 
 	// used for loading in an OBJ bunny
 	if (!BunnyLoader())
+	{
+		return false;
+	}
+
+	if (!BoxLoader())
 	{
 		return false;
 	}
@@ -126,6 +145,14 @@ void ComputerGraphicsApp::ImGUIRefresher()
 	ImGui::DragFloat3("Glabal Light Direction",
 		&m_light.direction[0],0.1f, 01,1);
 	ImGui::End();
+ImGui::Begin("Box Rot Settings");
+	ImGui::DragFloat3("Box Rot Axis", 
+		&m_boxRotAxis[0],0.0f,0,1);
+	ImGui::DragFloat("Box Rot",
+		&m_boxRot,0.1f, -1.0f,360);
+	ImGui::End();
+
+	
 ;}
 
 bool ComputerGraphicsApp::QuadLoader()
@@ -142,10 +169,10 @@ bool ComputerGraphicsApp::QuadLoader()
 	// Defined as 4 vertices for the 2 triangles
 	Mesh::Vertex vertices[4];
 
-	vertices[0].position = { -.5f,0, .5f,1 };
-	vertices[1].position = { .5f,0, .5f,1 };
-	vertices[2].position = { -.5f,0,-.5f,1 };
-	vertices[3].position = { .5f,0,-.5f,1 };
+	vertices[0].position = { -.5f,	0,	0.5f,	1 };
+	vertices[1].position = { 0.5f,	0,	0.5f,	1 };
+	vertices[2].position = { -.5f,	0,	-.5f,	1 };
+	vertices[3].position = { 0.5f,	0,	-.5f,	1 };
 
 	unsigned int indices[6] = { 0,1,2,2,1,3 };
 
@@ -176,6 +203,63 @@ void ComputerGraphicsApp::QuadDraw(glm::mat4 pvm)
 
 	// Draw the quad using mesh's draw
 	m_quadMesh.Draw();
+}
+
+bool ComputerGraphicsApp::BoxLoader()
+{
+	m_simpleShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
+	m_simpleShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
+
+	if (m_simpleShader.link() == false)
+	{
+		printf("Simple Shader has an Error: %s\n", m_simpleShader.getLastError());
+		return false;
+	}
+
+	// Defined as 4 vertices for the 2 triangles
+	Mesh::Vertex vertices[8];
+
+	vertices[0].position = { -.5f,	0,	0.5f,	1 };
+	vertices[1].position = { 0.5f,	0,	0.5f,	1 };
+	vertices[2].position = { -.5f,	0,	-.5f,	1 };
+	vertices[3].position = { 0.5f,	0,	-.5f,	1 };
+	
+	vertices[4].position = { 0.5f,	1,	-.5f,	1 };
+	vertices[5].position = { 0.5f,	1,	0.5f,	1 };
+	vertices[6].position = { -.5f,	1,	0.5f,	1 };
+	vertices[7].position = { -.5f,	1,	-.5f,	1 };
+
+	unsigned int indices[12] =
+		{
+		0,1,2,2,1,3,
+		3,4,5,3,5,1,
+		
+		};
+
+	m_boxMesh.Initialise(8, vertices, 12, indices);
+
+	// This is a 10 'unit' wide quad
+	m_boxTransform =
+	{
+		10,0,0,0,
+		0,10,0,0,
+		0,0,10,0,
+		0,0,0,1
+	};
+
+	return true;
+}
+
+void ComputerGraphicsApp::BoxDraw(glm::mat4 pvm)
+{
+	// Bind the Shader
+	m_simpleShader.bind();
+
+	//Bind the transform
+	m_simpleShader.bindUniform("ProjectionViewModel", pvm);
+
+	// Draw the quad using mesh's draw
+	m_boxMesh.Draw();
 }
 
 bool ComputerGraphicsApp::BunnyLoader()

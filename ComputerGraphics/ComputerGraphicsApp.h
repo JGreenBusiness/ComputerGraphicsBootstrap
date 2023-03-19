@@ -31,6 +31,9 @@ protected:
 
 	bool QuadLoader();
 	void QuadDraw(glm::mat4 pvm);
+	
+	bool BoxLoader();
+	void BoxDraw(glm::mat4 pvm);
 
 	bool BunnyLoader();
 	void BunnyDraw(glm::mat4 pvm);
@@ -47,6 +50,12 @@ protected:
 
 	Mesh				m_quadMesh;
 	glm::mat4			m_quadTransform;
+	
+	Mesh				m_boxMesh;
+	glm::mat4			m_boxTransform;
+	glm::vec3			m_boxRotAxis;
+	float				m_boxRot;
+	
 
 	aie::OBJMesh	m_bunnyMesh;
 	glm::mat4		m_bunnyTransform;
@@ -61,3 +70,5 @@ protected:
 	glm::vec3 m_ambientLight;
 
 };
+
+
