@@ -102,7 +102,7 @@ void ComputerGraphicsApp::draw() {
 	//PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
 
 
-	glm::mat4& currentShape = m_cylinderTransform;
+	glm::mat4& currentShape = m_diskTransform;
 	if(m_shapeRotAxis != glm::vec3(0))
 	{
 		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
@@ -111,7 +111,10 @@ void ComputerGraphicsApp::draw() {
 	//SimpleDraw(pv * m_boxTransform, m_boxMesh);
 	
 	// Draws the Box setup in BoxLoader
-	SimpleDraw(pv * m_cylinderTransform, m_cylinderMesh);
+	SimpleDraw(pv * m_diskTransform, m_diskMesh);
+	
+	// Draws the Box setup in BoxLoader
+	//SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
 
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
@@ -138,7 +141,12 @@ bool ComputerGraphicsApp::LaunchShaders()
 		return false;
 	}
 
-	if (!CylinderLoader())
+	if (!DiskLoader())
+	{
+		return false;
+	}
+
+	if (!PyramidLoader())
 	{
 		return false;
 	}
@@ -160,7 +168,7 @@ ImGui::Begin("Box Rot Settings");
 	ImGui::DragFloat3("Box Rot Axis", 
 		&m_shapeRotAxis[0],0.1f,0,1);
 	ImGui::DragFloat("Box Rot",
-		&m_shapeRot,0.1f, -1.0f,1);
+		&m_shapeRot,0.01f, -1.0f,1);
 	ImGui::End();
 
 	
@@ -263,7 +271,7 @@ bool ComputerGraphicsApp::BoxLoader()
 	return true;
 }
 
-bool ComputerGraphicsApp::CylinderLoader()
+bool ComputerGraphicsApp::DiskLoader()
 {
 	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
 	"./shaders/Phong.vert");
@@ -275,27 +283,54 @@ bool ComputerGraphicsApp::CylinderLoader()
 		return false;
 	}
 
-	// Defined as 4 vertices for the 2 triangles
-	Mesh::Vertex vertices[8];
+	// Positions of a circle not including the centre
+	std::vector<glm::vec4> vertPositions = CreateCircleArray(.5f,glm::vec3(0),30);
 
-	std::vector<glm::vec4> verts = CreateCircleArray(1,glm::vec3(0),6);
-	for(int i = 0;i < 6; i++)
+	// The verticies will be the fragment amount of the circle plus one to include the centre
+	Mesh::Vertex vertices[31];
+
+	// Setting the centre vert pos 
+	vertices[0].position = glm::vec4(0,0,0,1);
+
+	// Setting the vert pos for all points around the circle
+	for(int i = 1;i < 31; i++)
 	{
-		vertices[i].position = verts[i];
+		vertices[i].position = vertPositions[i];
 	}
 
-	unsigned int indices[20] =
-		{
-		0,1,2,2,3,0,
-		4,5,0,0,6,7
-		
-		
-		};
+	// index count is fragment amount * 3
+	const int indexCount = 90;
+	unsigned int indices[indexCount];
+	int indexOffset = 0;
 
-	m_cylinderMesh.Initialise(8, vertices, 20, indices);
+	// The draw order starts at 0 and index then counts up,
+	// every 3rd number will also be 0, then the number before 3rd will repeat.
+	// When the last number is reached, to complete the circle the draw order must finish at 1
+	// e.g. If there were 12 segements indices would be:
+	//		0,1,2,0,2,3,0,3,4,0...10,11,0,11,12,1 
+	indices[0] = 0;
+	for (int i = 1; i < indexCount; i++)
+	{
+		if (i == indexCount-1)
+		{
+			indices[i] = 1;
+		}
+		else if (i % 3 == 0)
+		{
+			indices[i] = 0;
+			indexOffset+=2;
+		}
+		else
+		{
+			indices[i] = i - indexOffset;
+		}
+	}
+
+
+	m_diskMesh.Initialise(31, vertices, indexCount, indices);
 
 	// This is a 10 'unit' wide quad
-	m_cylinderTransform =
+	m_diskTransform =
 	{
 		10,0,0,0,
 		0,10,0,0,
@@ -310,16 +345,59 @@ std::vector<glm::vec4> ComputerGraphicsApp::CreateCircleArray(float radius, glm:
 {
 	const float PI = 3.1415926f;
 
-	std::vector<glm::vec4> result;
+	std::vector<glm::vec4> circlePoints;
 
 	float increment = 2.0f * PI / fragments;
 
-	for (float currAngle = 0.0f; currAngle <= 2.0f * PI; currAngle += increment)
+	for (float currentAngle = 0.0f; currentAngle <= 2.0f * PI; currentAngle += increment)
 	{
-		result.push_back(glm::vec4(radius * cos(currAngle) + pos.x, radius * sin(currAngle) + pos.y, pos.z,1));
+		circlePoints.push_back(glm::vec4(radius * cos(currentAngle) + pos.x, radius * sin(currentAngle) + pos.y, pos.z,1));
 	}
 
-	return result;
+	return circlePoints;
+}
+
+bool ComputerGraphicsApp::PyramidLoader()
+{
+	m_simpleShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
+	m_simpleShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
+
+	if (m_simpleShader.link() == false)
+	{
+		printf("Simple Shader has an Error: %s\n", m_simpleShader.getLastError());
+		return false;
+	}
+
+	// Defined as 4 vertices for the 2 triangles
+	Mesh::Vertex vertices[4];
+
+	vertices[0].position = { 0.0f,	0,	0.55f,	1 };
+	vertices[1].position = { -.5f,	0,	-.5f,	1 };
+	vertices[2].position = { 0.5f,	0,	-.5f,	1 };
+	vertices[3].position = { 0.0f,	1,	0.0f,	1 };
+
+	unsigned int indices[12] =
+	{
+		0,1,2,
+		1,3,2,
+		2,3,0,
+		0,3,1
+
+
+	};
+
+	m_pyramidMesh.Initialise(4, vertices, 12, indices);
+
+	// This is a 10 'unit' wide quad
+	m_pyramidTransform =
+	{
+		10,0,0,0,
+		0,10,0,0,
+		0,0,10,0,
+		0,0,0,1
+	};
+
+	return true;
 }
 
 void ComputerGraphicsApp::SimpleDraw(glm::mat4 pvm, Mesh& mesh)

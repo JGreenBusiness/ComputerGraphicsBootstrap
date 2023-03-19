@@ -33,6 +33,7 @@ protected:
 	bool BoxLoader();
 	bool CylinderLoader();
 	std::vector<glm::vec4> CreateCircleArray(float radius, glm::vec3 pos, int fragments);
+	bool PyramidLoader();
 
 	bool BunnyLoader();
 	void BunnyDraw(glm::mat4 pvm);
@@ -55,6 +56,10 @@ protected:
 	Mesh				m_boxMesh;
 	glm::mat4			m_boxTransform;
     
+	Mesh				m_pyramidMesh;
+	glm::mat4			m_pyramidTransform;
+    	
+	  
 	Mesh				m_cylinderMesh;
 	glm::mat4			m_cylinderTransform;
     	
