@@ -22,10 +22,10 @@ void FlyCamera::Update(float deltaTime)
 
 	// We will used WASD to move and the Q and E to go up and down
 
-	float camSpeed = 1;
+	float camSpeed = m_cameraDefaultSpeed;
 	if (input->isKeyDown(aie::INPUT_KEY_LEFT_SHIFT))
 	{
-		camSpeed = m_cameraSpeed;
+		camSpeed = m_cameraFastSpeed;
 	}
 
 	if (input->isKeyDown(aie::INPUT_KEY_W))
