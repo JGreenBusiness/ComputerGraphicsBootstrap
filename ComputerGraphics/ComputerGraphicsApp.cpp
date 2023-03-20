@@ -104,7 +104,7 @@ void ComputerGraphicsApp::draw() {
 	//PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
 
 
-	glm::mat4& currentShape = m_diskTransform;
+	glm::mat4& currentShape = m_pyramidTransform;
 	if(m_shapeRotAxis != glm::vec3(0))
 	{
 		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
@@ -113,10 +113,10 @@ void ComputerGraphicsApp::draw() {
 	//SimpleDraw(pv * m_boxTransform, m_boxMesh);
 	
 	// Draws the Disk setup in DiskLoader
-	SimpleDraw(pv * m_diskTransform, m_diskMesh);
+	//SimpleDraw(pv * m_diskTransform, m_diskMesh);
 	
 	// Draws the Pyramid setup in PyramidLoader
-	//SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
+	SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
 
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
@@ -375,21 +375,23 @@ bool ComputerGraphicsApp::PyramidLoader()
 	// Defined as 4 vertices for the 2 triangles
 	Mesh::Vertex vertices[5];
 
-	vertices[0].position = { 0.0f,	1,	0.0f,	1 };
+	vertices[0].position = { 0.0f,	1,	0.0f,	1 }; // Top
 
-	vertices[1].position = { -.5f,	0,	-.5f,	1 };
-	vertices[2].position = { 0.5f,	0,	-.5f,	1 };
-	vertices[3].position = { 0.5f,	0,	0.5f,	1 };
-	vertices[3].position = { -.5f,	0,	0.5f,	1 };
+	vertices[1].position = { -.5f,	0,	-.5f,	1 }; // back left
+	vertices[2].position = { 0.5f,	0,	-.5f,	1 }; // back right
+	vertices[3].position = { 0.5f,	0,	0.5f,	1 }; // font right
+	vertices[4].position = { -.5f,	0,	0.5f,	1 }; // front left
 
-	unsigned int indices[12] =
+	unsigned int indices[30] =
 	{
-		1,4,3,1,2,3
+		3,4,1,1,2,3,
+		3,0,4,4,0,1,
+		1,0,2,2,0,3
 
 
 	};
 
-	m_pyramidMesh.Initialise(5, vertices, 20, indices);
+	m_pyramidMesh.Initialise(5, vertices, 30, indices);
 
 	// This is a 10 'unit' wide quad
 	m_pyramidTransform =

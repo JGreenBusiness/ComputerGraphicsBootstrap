@@ -4,7 +4,7 @@
 
 SimpleCamera::SimpleCamera()
 {
-	m_position = glm::vec3(-10, 2, 0);
+	m_position = glm::vec3(-20, 5, 0);
 
 	m_projectionViewTransform = glm::mat4();
 	m_worldTransoform = glm::mat4();

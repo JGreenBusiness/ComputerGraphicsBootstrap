@@ -3,6 +3,10 @@
 class StationaryCamera :public SimpleCamera
 {
 public:
+	StationaryCamera();
+	~StationaryCamera();
+	
+	void SetRotation(glm::vec3 rotation);
 protected:
 private:
 	
