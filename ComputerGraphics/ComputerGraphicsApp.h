@@ -47,9 +47,12 @@ protected:
 	glm::mat4	m_viewMatrix;
 	glm::mat4	m_projectionMatrix;
 
+	aie::Texture m_gridTexture;
+
 	aie::ShaderProgram	m_simpleShader;
 	aie::ShaderProgram	m_colourShader;
 	aie::ShaderProgram	m_phongShader;
+	aie::ShaderProgram	m_texturedShader;
 
 	Mesh				m_quadMesh;
 	glm::mat4			m_quadTransform;
