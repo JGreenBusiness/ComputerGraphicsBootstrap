@@ -35,6 +35,7 @@ protected:
 	bool DiskLoader();
 	std::vector<glm::vec4> CreateCircleArray(float radius, glm::vec3 pos, int fragments);
 	bool PyramidLoader();
+	bool ConeLoader();
 
 	bool BunnyLoader();
 	void BunnyDraw(glm::mat4 pvm);
@@ -66,6 +67,9 @@ protected:
 	  
 	Mesh				m_diskMesh;
 	glm::mat4			m_diskTransform;
+    	  
+	Mesh				m_coneMesh;
+	glm::mat4			m_coneTransform;
     	
 	
 

@@ -104,7 +104,7 @@ void ComputerGraphicsApp::draw() {
 	//PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
 
 
-	glm::mat4& currentShape = m_pyramidTransform;
+	glm::mat4& currentShape = m_coneTransform;
 	if(m_shapeRotAxis != glm::vec3(0))
 	{
 		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
@@ -114,9 +114,12 @@ void ComputerGraphicsApp::draw() {
 	
 	// Draws the Disk setup in DiskLoader
 	//SimpleDraw(pv * m_diskTransform, m_diskMesh);
+		
+	// Draws the Disk setup in DiskLoader
+	SimpleDraw(pv * m_coneTransform, m_coneMesh);
 	
 	// Draws the Pyramid setup in PyramidLoader
-	SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
+	//SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
 
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
@@ -149,6 +152,11 @@ bool ComputerGraphicsApp::LaunchShaders()
 	}
 
 	if (!PyramidLoader())
+	{
+		return false;
+	}
+	
+	if (!ConeLoader())
 	{
 		return false;
 	}
@@ -404,6 +412,96 @@ bool ComputerGraphicsApp::PyramidLoader()
 
 	return true;
 }
+
+bool ComputerGraphicsApp::ConeLoader()
+{
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/Phong.vert");
+	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/Phong.frag");
+	if (m_phongShader.link() == false)
+	{
+		printf("Color shader Error: %s\n", m_phongShader.getLastError());
+		return false;
+	}
+
+	const int segments = 12;
+	// Positions of a circle not including the centre
+	std::vector<glm::vec4> vertPositions = CreateCircleArray(.5f, glm::vec3(0), segments);
+
+	// The verticies will be the fragment amount of the circle plus one to include the centre
+
+	Mesh::Vertex vertices[segments + 2];
+	// Setting the centre vert pos 
+
+	// Setting the vert pos for all points around the circle
+	for (int i = 1;i < segments + 1; i++)
+	{
+		vertices[i].position = vertPositions[i];
+	}
+
+	// index count is fragment amount * 3
+	const int indexCount = segments * 6;
+	unsigned int indices[indexCount];
+	int indexOffset = 0;
+	vertices[0].position = glm::vec4(0, 0, 0, 1);
+	vertices[segments+1].position = glm::vec4(0, 0, -1, 1);
+
+	// The draw order starts at 0 and index then counts up,
+	// every 3rd number will also be 0, then the number before 3rd will repeat.
+	// When the last number is reached, to complete the circle the draw order must finish at 1
+	// e.g. If there were 12 segements indices would be:
+	//		0,1,2,0,2,3,0,3,4,0...10,11,0,11,12,1 
+	indices[0] = 0;
+	for (int i = 1; i < indexCount / 2; i++)
+	{
+		if (i == (indexCount/2) - 1)
+		{
+			indices[i] = 1;
+		}
+		else if (i % 3 == 0)
+		{
+			indices[i] = 0;
+			indexOffset += 2;
+		}
+		else
+		{
+			indices[i] = i - indexOffset;
+		}
+	}
+
+	for (int i = (indexCount / 2); i < indexCount; i++)
+	{
+		if (i == indexCount - 1)
+		{
+			indices[i] = 1;
+		}
+		else if (i % 3 == 0)
+		{
+			indices[i] = segments+1;
+			indexOffset += 2;
+		}
+		else
+		{
+			indices[i] = i - indexOffset;
+		}
+	}
+
+		m_coneMesh.Initialise(14, vertices, indexCount, indices);
+
+		// This is a 10 'unit' wide quad
+		m_coneTransform =
+		{
+			10,0,0,0,
+			0,10,0,0,
+			0,0,10,0,
+			0,0,0,1
+		};
+
+		return true;
+}
+
+
 
 void ComputerGraphicsApp::SimpleDraw(glm::mat4 pvm, Mesh& mesh)
 {
