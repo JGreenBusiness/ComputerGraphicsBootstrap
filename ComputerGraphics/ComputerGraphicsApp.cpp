@@ -104,16 +104,16 @@ void ComputerGraphicsApp::draw() {
 	//PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
 
 
-	glm::mat4& currentShape = m_boxTransform;
+	glm::mat4& currentShape = m_diskTransform;
 	if(m_shapeRotAxis != glm::vec3(0))
 	{
 		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
 	}
 	// Draws the Box setup in BoxLoader
-	SimpleDraw(pv * m_boxTransform, m_boxMesh);
+	//SimpleDraw(pv * m_boxTransform, m_boxMesh);
 	
 	// Draws the Disk setup in DiskLoader
-	//SimpleDraw(pv * m_diskTransform, m_diskMesh);
+	SimpleDraw(pv * m_diskTransform, m_diskMesh);
 	
 	// Draws the Pyramid setup in PyramidLoader
 	//SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
