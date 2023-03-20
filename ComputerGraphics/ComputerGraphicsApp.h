@@ -10,6 +10,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <vector>
+#include "FlyCamera.h"
 
 
 class ComputerGraphicsApp : public aie::Application {
@@ -31,7 +32,7 @@ protected:
 
 	bool QuadLoader();
 	bool BoxLoader();
-	bool CylinderLoader();
+	bool DiskLoader();
 	std::vector<glm::vec4> CreateCircleArray(float radius, glm::vec3 pos, int fragments);
 	bool PyramidLoader();
 
@@ -60,16 +61,19 @@ protected:
 	glm::mat4			m_pyramidTransform;
     	
 	  
-	Mesh				m_cylinderMesh;
-	glm::mat4			m_cylinderTransform;
+	Mesh				m_diskMesh;
+	glm::mat4			m_diskTransform;
     	
 	
 
 	aie::OBJMesh	m_bunnyMesh;
 	glm::mat4		m_bunnyTransform;
 
-	glm::vec3			m_shapeRotAxis;
-	float				m_shapeRot;
+	glm::vec3		m_shapeRotAxis;
+	float			m_shapeRot;
+
+	FlyCamera	m_camera;
+
 	struct Light
 	{
 		glm::vec3 direction;

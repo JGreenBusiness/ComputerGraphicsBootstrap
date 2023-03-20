@@ -25,8 +25,11 @@ bool ComputerGraphicsApp::startup() {
 	Gizmos::create(10000, 10000, 10000, 10000);
 
 	// create simple camera transforms
-	m_viewMatrix = glm::lookAt(vec3(15), vec3(0), vec3(0, 1, 0));
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
+	m_viewMatrix = m_camera.GetViewMatrix();
+		//glm::lookAt(vec3(15), vec3(0), vec3(0, 1, 0));
+	m_projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(),
+		getWindowHeight());
+		//glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 	m_light.colour = { 1,1,0 };
 	m_ambientLight = { .5f,.5f,.5f };
@@ -46,6 +49,8 @@ void ComputerGraphicsApp::update(float deltaTime) {
 
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
+
+	m_camera.Update(deltaTime);
 
 	// draw a simple grid with gizmos
 	vec4 white(1);
@@ -73,9 +78,6 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	m_light.direction = 
 		glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2),0));
 
-	
-
-
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
 	
@@ -87,9 +89,9 @@ void ComputerGraphicsApp::draw() {
 	// wipe the screen to the background colour
 	clearScreen();
 
-	// update perspective based on screen size
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f,
-		getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
+	m_viewMatrix = m_camera.GetViewMatrix();
+	m_projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(),
+		getWindowHeight());
 
 	auto pv = m_projectionMatrix * m_viewMatrix ;
 	
@@ -102,18 +104,18 @@ void ComputerGraphicsApp::draw() {
 	//PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
 
 
-	glm::mat4& currentShape = m_diskTransform;
+	glm::mat4& currentShape = m_boxTransform;
 	if(m_shapeRotAxis != glm::vec3(0))
 	{
 		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
 	}
 	// Draws the Box setup in BoxLoader
-	//SimpleDraw(pv * m_boxTransform, m_boxMesh);
+	SimpleDraw(pv * m_boxTransform, m_boxMesh);
 	
-	// Draws the Box setup in BoxLoader
-	SimpleDraw(pv * m_diskTransform, m_diskMesh);
+	// Draws the Disk setup in DiskLoader
+	//SimpleDraw(pv * m_diskTransform, m_diskMesh);
 	
-	// Draws the Box setup in BoxLoader
+	// Draws the Pyramid setup in PyramidLoader
 	//SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
 
 
@@ -284,22 +286,22 @@ bool ComputerGraphicsApp::DiskLoader()
 	}
 
 	// Positions of a circle not including the centre
-	std::vector<glm::vec4> vertPositions = CreateCircleArray(.5f,glm::vec3(0),30);
+	std::vector<glm::vec4> vertPositions = CreateCircleArray(.5f,glm::vec3(0),12);
 
 	// The verticies will be the fragment amount of the circle plus one to include the centre
-	Mesh::Vertex vertices[31];
+	Mesh::Vertex vertices[13];
 
 	// Setting the centre vert pos 
 	vertices[0].position = glm::vec4(0,0,0,1);
 
 	// Setting the vert pos for all points around the circle
-	for(int i = 1;i < 31; i++)
+	for(int i = 1;i < 13; i++)
 	{
 		vertices[i].position = vertPositions[i];
 	}
 
 	// index count is fragment amount * 3
-	const int indexCount = 90;
+	const int indexCount = 36;
 	unsigned int indices[indexCount];
 	int indexOffset = 0;
 
@@ -327,7 +329,9 @@ bool ComputerGraphicsApp::DiskLoader()
 	}
 
 
-	m_diskMesh.Initialise(31, vertices, indexCount, indices);
+
+
+	m_diskMesh.Initialise(13, vertices, indexCount, indices);
 
 	// This is a 10 'unit' wide quad
 	m_diskTransform =
@@ -369,24 +373,23 @@ bool ComputerGraphicsApp::PyramidLoader()
 	}
 
 	// Defined as 4 vertices for the 2 triangles
-	Mesh::Vertex vertices[4];
+	Mesh::Vertex vertices[5];
 
-	vertices[0].position = { 0.0f,	0,	0.55f,	1 };
+	vertices[0].position = { 0.0f,	1,	0.0f,	1 };
+
 	vertices[1].position = { -.5f,	0,	-.5f,	1 };
 	vertices[2].position = { 0.5f,	0,	-.5f,	1 };
-	vertices[3].position = { 0.0f,	1,	0.0f,	1 };
+	vertices[3].position = { 0.5f,	0,	0.5f,	1 };
+	vertices[3].position = { -.5f,	0,	0.5f,	1 };
 
 	unsigned int indices[12] =
 	{
-		0,1,2,
-		1,3,2,
-		2,3,0,
-		0,3,1
+		1,4,3,1,2,3
 
 
 	};
 
-	m_pyramidMesh.Initialise(4, vertices, 12, indices);
+	m_pyramidMesh.Initialise(5, vertices, 20, indices);
 
 	// This is a 10 'unit' wide quad
 	m_pyramidTransform =

@@ -4,6 +4,7 @@
 #include <glm/ext.hpp>
 #include "Planetoid.h"
 #include <vector>
+#include "FlyCamera.h"
 
 class SolarSystem : public aie::Application
 {
@@ -27,6 +28,9 @@ protected:
 	const glm::mat4* m_mat;
 
 	std::vector<Planetoid*> m_planets;
+
+	FlyCamera	m_camera;
+
 
 };
 

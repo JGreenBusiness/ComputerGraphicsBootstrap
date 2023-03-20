@@ -84,6 +84,9 @@ void SolarSystem::update(float deltaTime) {
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
 
+	m_camera.Update(deltaTime);
+
+
 	// draw a simple grid with gizmos
 	vec4 white(1);
 	vec4 black(0, 0, 0, 1);
@@ -131,9 +134,9 @@ void SolarSystem::draw() {
 	// wipe the screen to the background colour
 	clearScreen();
 
-	// update perspective based on screen size
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
-
+	m_viewMatrix = m_camera.GetViewMatrix();
+	m_projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(),
+		getWindowHeight());
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 }
 
