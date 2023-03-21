@@ -106,7 +106,12 @@ void ComputerGraphicsApp::draw() {
 	//Draw the bunny up in BunnyLoader
 	//BunnyDraw(pv * m_bunnyTransform);
 
+	//Draws the spear with light texture
 	OBJDraw(pv, m_spearTransform, m_spearMesh);
+
+
+	OBJDraw(pv, m_gunTransform, m_gunMesh);
+
 
 	//PhongDraw(pv * m_spearTransform, m_spearTransform);
 
@@ -192,10 +197,10 @@ bool ComputerGraphicsApp::LaunchShaders()
 		return false;
 	}
 			
-	//if (!FrogLoader())
-	//{
-	//	return false;
-	//}
+	if (!GunLoader())
+	{
+		return false;
+	}
 
 
 	return true;
@@ -674,27 +679,17 @@ void ComputerGraphicsApp::OBJDraw(glm::mat4& pv, glm::mat4& transform, aie::OBJM
 	objMesh.draw();
 }
 
-bool ComputerGraphicsApp::FrogLoader()
+bool ComputerGraphicsApp::GunLoader()
 {
-	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
-		"./shaders/textured.vert");
-	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
-		"./shaders/textured.frag");
-	if (m_phongShader.link() == false)
+	if (m_gunMesh.load("./gun/M1887.obj", true, true) == false)
 	{
-		printf("Color shader Error: %s\n", m_phongShader.getLastError());
+		printf("Gun Mesh Error!\n");
 		return false;
 	}
-
-	if (m_frogMesh.load("./frog/PT2SmoothedChin.obj", true, true) == false)
-	{
-		printf("Frog Mesh Error!\n");
-		return false;
-	}
-	m_frogTransform = {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
+	m_gunTransform = {
+		10, 0, 0, 0,
+		0, 10, 0, 0,
+		0, 0, 10, 0,
 		0, 0, 0, 1 };
 
 	return true;

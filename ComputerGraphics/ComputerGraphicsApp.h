@@ -47,8 +47,7 @@ protected:
 	// For Textured OBJs
 	void OBJDraw(glm::mat4& pvm, glm::mat4& Transform, aie::OBJMesh& objMesh);
 	
-	bool FrogLoader();
-	void FrogDraw(glm::mat4 pvm);
+	bool GunLoader();
 
 	void PhongDraw(glm::mat4 pvm, glm::mat4 transform);
 	void PhongDraw(glm::mat4 pvm, glm::mat4 transform,Mesh& mesh);
@@ -96,8 +95,8 @@ protected:
 	aie::OBJMesh	m_spearMesh;
 	glm::mat4		m_spearTransform;
 	
-	aie::OBJMesh	m_frogMesh;
-	glm::mat4		m_frogTransform;
+	aie::OBJMesh	m_gunMesh;
+	glm::mat4		m_gunTransform;
 
 
 	glm::vec3		m_shapeRotAxis;
