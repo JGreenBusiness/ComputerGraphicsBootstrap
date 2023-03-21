@@ -24,6 +24,8 @@ bool ComputerGraphicsApp::startup() {
 	// initialise gizmo primitive counts
 	Gizmos::create(10000, 10000, 10000, 10000);
 
+	m_camera.SetPosition(glm::vec3(0, 0, 1));
+
 	// create simple camera transforms
 	m_viewMatrix = m_camera.GetViewMatrix();
 		//glm::lookAt(vec3(15), vec3(0), vec3(0, 1, 0));
@@ -31,11 +33,14 @@ bool ComputerGraphicsApp::startup() {
 		getWindowHeight());
 		//glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
+
 	m_light.colour = { 1,1,0 };
 	m_ambientLight = { .5f,.5f,.5f };
 
 	m_shapeRot = 0;
 	m_shapeRotAxis = glm::vec3(0,1,0);
+	
+	m_isTextured = 0;
 
 	return LaunchShaders();
 }
@@ -101,10 +106,10 @@ void ComputerGraphicsApp::draw() {
 	//Draw the bunny up in BunnyLoader
 	//BunnyDraw(pv * m_bunnyTransform);
 
-	//PhongDraw(pv * m_bunnyTransform,m_bunnyTransform);
+	PhongDraw(pv * m_frogTransform, m_frogTransform);
 
 
-	glm::mat4& currentShape = m_coneTransform;
+	glm::mat4& currentShape = m_frogTransform;
 	if(m_shapeRotAxis != glm::vec3(0))
 	{
 		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
@@ -116,10 +121,15 @@ void ComputerGraphicsApp::draw() {
 	//SimpleDraw(pv * m_diskTransform, m_diskMesh);
 		
 	// Draws the Disk setup in DiskLoader
-	SimpleDraw(pv * m_coneTransform, m_coneMesh);
+	//SimpleDraw(pv * m_coneTransform, m_coneMesh);
 	
 	// Draws the Pyramid setup in PyramidLoader
 	//SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
+
+	// Draws he quad setup in QuadLoader
+	//TexturedQuadDraw(pv * m_texturedQuadTransform);
+
+	//SpearDraw(pv * m_spearTransform);
 
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
@@ -157,6 +167,21 @@ bool ComputerGraphicsApp::LaunchShaders()
 	}
 	
 	if (!ConeLoader())
+	{
+		return false;
+	}
+		
+	if (!TexturedQuadLoader())
+	{
+		return false;
+	}
+			
+	if (!SpearLoader())
+	{
+		return false;
+	}
+			
+	if (!FrogLoader())
 	{
 		return false;
 	}
@@ -212,6 +237,38 @@ bool ComputerGraphicsApp::QuadLoader()
 
 	// This is a 10 'unit' wide quad
 	m_quadTransform =
+	{
+		10,0,0,0,
+		0,10,0,0,
+		0,0,10,0,
+		0,0,0,1
+	};
+
+	return true;
+}
+
+bool ComputerGraphicsApp::TexturedQuadLoader()
+{
+	m_texturedShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/textured.vert");
+	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/textured.frag");
+	if (m_texturedShader.link() == false)
+	{
+		printf("Texture shader Error: %s\n", m_texturedShader.getLastError());
+		return false;
+	}
+
+	if (m_gridTexture.load("./textures/numbered_grid.tga") == false)
+	{
+		printf("Failed to load the grid texture correctly\n"); 
+		return false;
+	}
+
+	m_texturedQuadMesh.InitialiseQuad();
+
+
+	m_texturedQuadTransform =
 	{
 		10,0,0,0,
 		0,10,0,0,
@@ -501,8 +558,6 @@ bool ComputerGraphicsApp::ConeLoader()
 		return true;
 }
 
-
-
 void ComputerGraphicsApp::SimpleDraw(glm::mat4 pvm, Mesh& mesh)
 {
 	// Bind the Shader
@@ -513,6 +568,23 @@ void ComputerGraphicsApp::SimpleDraw(glm::mat4 pvm, Mesh& mesh)
 
 	// Draw the quad using mesh's draw
 	mesh.Draw();
+}
+
+void ComputerGraphicsApp::TexturedQuadDraw(glm::mat4 pvm)
+{
+	// Bind the shader
+	m_texturedShader.bind();
+
+	//Bind the transform
+	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+
+	//Bind the texture location
+	m_texturedShader.bindUniform("diffuseTexture",0);
+
+	//Bind the texture to a specific location
+	m_gridTexture.bind(0);
+
+	m_texturedQuadMesh.Draw();
 }
 
 bool ComputerGraphicsApp::BunnyLoader()
@@ -551,6 +623,70 @@ void ComputerGraphicsApp::BunnyDraw(glm::mat4 pvm)
 	m_bunnyMesh.draw();
 }
 
+bool ComputerGraphicsApp::SpearLoader()
+{
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/textured.vert");
+	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/textured.frag");
+	if (m_phongShader.link() == false)
+	{
+		printf("Color shader Error: %s\n", m_phongShader.getLastError());
+		return false;
+	}
+
+	if (m_spearMesh.load("./soulspear/soulspear.obj",true,true) == false)
+	{
+		printf("Soulspear Mesh Error!\n");
+		return false;
+	}
+	m_spearTransform = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1 };
+
+	return true;
+}
+
+void ComputerGraphicsApp::SpearDraw(glm::mat4 pvm)
+{
+	m_colourShader.bind();
+
+	m_colourShader.bindUniform("ProjectionViewModel", pvm);
+	
+	m_colourShader.bindUniform("BaseColour", glm::vec4(1));
+
+
+	m_spearMesh.draw();
+}
+
+bool ComputerGraphicsApp::FrogLoader()
+{
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/textured.vert");
+	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/textured.frag");
+	if (m_phongShader.link() == false)
+	{
+		printf("Color shader Error: %s\n", m_phongShader.getLastError());
+		return false;
+	}
+
+	if (m_frogMesh.load("./frog/PT2SmoothedChin.obj", true, true) == false)
+	{
+		printf("Frog Mesh Error!\n");
+		return false;
+	}
+	m_frogTransform = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1 };
+
+	return true;
+}
+
 void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform)
 {
 	// Bind the phong shader
@@ -571,7 +707,7 @@ void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform)
 	// bind the transofrm using the one provided
 	m_phongShader.bindUniform("ModelMatrix", transform);
 
-	m_bunnyMesh.draw();
+	m_frogMesh.draw();
 }
 
 void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform, Mesh& mesh)

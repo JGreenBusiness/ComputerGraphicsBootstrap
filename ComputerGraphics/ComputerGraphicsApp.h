@@ -4,13 +4,13 @@
 #include "Shader.h"
 
 #include "OBJMesh.h"
-
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <vector>
 #include "FlyCamera.h"
+#include "Texture.h"
 
 
 class ComputerGraphicsApp : public aie::Application {
@@ -31,18 +31,27 @@ protected:
 	void ImGUIRefresher();
 
 	bool QuadLoader();
+	bool TexturedQuadLoader();
 	bool BoxLoader();
 	bool DiskLoader();
 	std::vector<glm::vec4> CreateCircleArray(float radius, glm::vec3 pos, int fragments);
 	bool PyramidLoader();
 	bool ConeLoader();
 
+
 	bool BunnyLoader();
 	void BunnyDraw(glm::mat4 pvm);
+
+	bool SpearLoader();
+	void SpearDraw(glm::mat4 pvm);
+	
+	bool FrogLoader();
+	void FrogDraw(glm::mat4 pvm);
 
 	void PhongDraw(glm::mat4 pvm, glm::mat4 transform);
 	void PhongDraw(glm::mat4 pvm, glm::mat4 transform,Mesh& mesh);
 	void SimpleDraw(glm::mat4 pvm, Mesh& mesh);
+	void TexturedQuadDraw(glm::mat4 pvm);
 
 	// camera transforms
 	glm::mat4	m_viewMatrix;
@@ -57,6 +66,11 @@ protected:
 
 	Mesh				m_quadMesh;
 	glm::mat4			m_quadTransform;
+	
+	Mesh				m_texturedQuadMesh;
+	glm::mat4			m_texturedQuadTransform;
+	aie::Texture		m_quadTexture;
+	bool				m_isTextured;
 	
 	Mesh				m_boxMesh;
 	glm::mat4			m_boxTransform;
@@ -75,6 +89,13 @@ protected:
 
 	aie::OBJMesh	m_bunnyMesh;
 	glm::mat4		m_bunnyTransform;
+	
+	aie::OBJMesh	m_spearMesh;
+	glm::mat4		m_spearTransform;
+	
+	aie::OBJMesh	m_frogMesh;
+	glm::mat4		m_frogTransform;
+
 
 	glm::vec3		m_shapeRotAxis;
 	float			m_shapeRot;
