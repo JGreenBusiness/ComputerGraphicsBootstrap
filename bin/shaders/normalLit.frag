@@ -50,7 +50,7 @@ void main()
     // Calclate the view vector...
     vec3 V = normalize(CameraPosition - vPosition.xyz);
     //... and the reflection vector
-    vec3 R = reflect(L,N);
+    vec3 R = reflect(L,N);n
 
     // Calculate the specular term
     float specularTerm = pow(max(0,dot(R,V)),Ns);

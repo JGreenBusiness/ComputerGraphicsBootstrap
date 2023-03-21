@@ -42,6 +42,8 @@ bool ComputerGraphicsApp::startup() {
 	
 	m_isTextured = 0;
 
+
+
 	return LaunchShaders();
 }
 
@@ -146,13 +148,13 @@ void ComputerGraphicsApp::draw() {
 
 bool ComputerGraphicsApp::LaunchShaders()
 {
-	m_normalLItShader.loadShader(aie::eShaderStage::VERTEX,
+	m_shader.loadShader(aie::eShaderStage::VERTEX,
 		"./shaders/normalLit.vert");
-	m_normalLItShader.loadShader(aie::eShaderStage::FRAGMENT,
+	m_shader.loadShader(aie::eShaderStage::FRAGMENT,
 		"./shaders/normalLit.frag");
-	if (m_normalLItShader.link() == false)
+	if (m_shader.link() == false)
 	{
-		printf("NormalLit shader Error: %s\n", m_normalLItShader.getLastError());
+		printf("NormalLit shader Error: %s\n", m_shader.getLastError());
 		return false;
 	}
 	// used for loading in a simple quad
@@ -202,6 +204,8 @@ bool ComputerGraphicsApp::LaunchShaders()
 		return false;
 	}
 
+	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(),getWindowHeight() ),
+		m_light, m_ambientLight);
 
 	return true;
 }
@@ -657,24 +661,24 @@ bool ComputerGraphicsApp::SpearLoader()
 
 void ComputerGraphicsApp::OBJDraw(glm::mat4& pv, glm::mat4& transform, aie::OBJMesh& objMesh)
 {
-	m_normalLItShader.bind();
+	m_shader.bind();
 
 
-	m_normalLItShader.bindUniform("CameraPosition",
+	m_shader.bindUniform("CameraPosition",
 		glm::vec3(m_viewMatrix[3]));
 
 	//Bind the direction light we defind
-	m_normalLItShader.bindUniform("LightDirection", m_light.direction);
-	m_normalLItShader.bindUniform("AmbientColour", m_ambientLight);
-	m_normalLItShader.bindUniform("LightColour", m_light.colour);
+	m_shader.bindUniform("LightDirection", m_light.direction);
+	m_shader.bindUniform("AmbientColour", m_ambientLight);
+	m_shader.bindUniform("LightColour", m_light.colour);
 
 	// Bind texture location
-	m_normalLItShader.bindUniform("diffuseTexture", 0);
+	m_shader.bindUniform("diffuseTexture", 0);
 
-	m_normalLItShader.bindUniform("ProjectionViewModel", pv * transform);
+	m_shader.bindUniform("ProjectionViewModel", pv * transform);
 
 	// bind the transofrm using the one provided
-	m_normalLItShader.bindUniform("ModelMatrix", transform);
+	m_shader.bindUniform("ModelMatrix", transform);
 
 	objMesh.draw();
 }

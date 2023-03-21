@@ -11,7 +11,8 @@
 #include <vector>
 #include "FlyCamera.h"
 #include "Texture.h"
-
+#include "Scene.h"
+#include "Instance.h"
 
 class ComputerGraphicsApp : public aie::Application {
 public:
@@ -54,6 +55,8 @@ protected:
 	void SimpleDraw(glm::mat4 pvm, Mesh& mesh);
 	void TexturedQuadDraw(glm::mat4 pvm);
 
+	Scene*		m_scene;
+
 	// camera transforms
 	glm::mat4	m_viewMatrix;
 	glm::mat4	m_projectionMatrix;
@@ -64,7 +67,7 @@ protected:
 	aie::ShaderProgram	m_colourShader;
 	aie::ShaderProgram	m_phongShader;
 	aie::ShaderProgram	m_texturedShader;
-	aie::ShaderProgram	m_normalLItShader;
+	aie::ShaderProgram	m_shader;
 
 	Mesh				m_quadMesh;
 	glm::mat4			m_quadTransform;
@@ -112,6 +115,7 @@ protected:
 
 	Light m_light;
 	glm::vec3 m_ambientLight;
+
 
 };
 
