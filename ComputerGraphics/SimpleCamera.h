@@ -6,6 +6,8 @@ public:
 	SimpleCamera();
 	~SimpleCamera();
 
+	virtual void Update(float deltaTime) {};
+
 	glm::vec3 GetPosition()
 		{ return m_position; }
 

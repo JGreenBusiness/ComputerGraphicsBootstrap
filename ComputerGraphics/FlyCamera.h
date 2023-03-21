@@ -7,7 +7,7 @@ public:
 	FlyCamera();
 	~FlyCamera();
 
-	void Update(float deltaTime);
+	void Update(float deltaTime) override;
 	void SetFastSpeed(float speed) { m_cameraFastSpeed = speed; }
 	void SetdefaultSpeed(float speed) { m_cameraDefaultSpeed = speed; }
 

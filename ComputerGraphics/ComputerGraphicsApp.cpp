@@ -24,12 +24,16 @@ bool ComputerGraphicsApp::startup() {
 	// initialise gizmo primitive counts
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-	m_camera.SetPosition(glm::vec3(0, 0, 1));
+	m_flyCamera = new FlyCamera();
+	m_camera = m_flyCamera;
+	m_light = Light();
+
+	m_camera->SetPosition(glm::vec3(0, 0, 1));
 
 	// create simple camera transforms
-	m_viewMatrix = m_camera.GetViewMatrix();
+	m_viewMatrix = m_camera->GetViewMatrix();
 		//glm::lookAt(vec3(15), vec3(0), vec3(0, 1, 0));
-	m_projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(),
+	m_projectionMatrix = m_camera->GetProjectionMatrix(getWindowWidth(),
 		getWindowHeight());
 		//glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
@@ -47,8 +51,12 @@ bool ComputerGraphicsApp::startup() {
 	return LaunchShaders();
 }
 
-void ComputerGraphicsApp::shutdown() {
-
+void ComputerGraphicsApp::shutdown() 
+{
+	if (m_camera != nullptr)
+	{
+		delete m_camera;
+	}
 	Gizmos::destroy();
 }
 
@@ -57,7 +65,8 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
 
-	m_camera.Update(deltaTime);
+
+	m_camera->Update(deltaTime);
 
 	// draw a simple grid with gizmos
 	vec4 white(1);
@@ -96,8 +105,8 @@ void ComputerGraphicsApp::draw() {
 	// wipe the screen to the background colour
 	clearScreen();
 
-	m_viewMatrix = m_camera.GetViewMatrix();
-	m_projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(),
+	m_viewMatrix = m_camera->GetViewMatrix();
+	m_projectionMatrix = m_camera->GetProjectionMatrix(getWindowWidth(),
 		getWindowHeight());
 
 	auto pv = m_projectionMatrix * m_viewMatrix ;
@@ -204,7 +213,9 @@ bool ComputerGraphicsApp::LaunchShaders()
 		return false;
 	}
 
-	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(),getWindowHeight() ),
+	SimpleCamera* cameraTest = new FlyCamera();
+
+	m_scene = new Scene(cameraTest, glm::vec2(getWindowWidth(),getWindowHeight()),
 		m_light, m_ambientLight);
 
 	return true;

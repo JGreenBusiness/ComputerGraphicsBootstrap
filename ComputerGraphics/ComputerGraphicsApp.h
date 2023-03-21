@@ -105,13 +105,8 @@ protected:
 	glm::vec3		m_shapeRotAxis;
 	float			m_shapeRot;
 
-	FlyCamera	m_camera;
-
-	struct Light
-	{
-		glm::vec3 direction;
-		glm::vec3 colour;
-	};
+	SimpleCamera*	m_camera;
+	FlyCamera*		m_flyCamera;
 
 	Light m_light;
 	glm::vec3 m_ambientLight;
