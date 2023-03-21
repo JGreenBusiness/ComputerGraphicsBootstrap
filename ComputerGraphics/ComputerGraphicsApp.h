@@ -43,7 +43,9 @@ protected:
 	void BunnyDraw(glm::mat4 pvm);
 
 	bool SpearLoader();
-	void SpearDraw(glm::mat4 pvm);
+
+	// For Textured OBJs
+	void OBJDraw(glm::mat4& pvm, glm::mat4& Transform, aie::OBJMesh& objMesh);
 	
 	bool FrogLoader();
 	void FrogDraw(glm::mat4 pvm);
@@ -63,6 +65,7 @@ protected:
 	aie::ShaderProgram	m_colourShader;
 	aie::ShaderProgram	m_phongShader;
 	aie::ShaderProgram	m_texturedShader;
+	aie::ShaderProgram	m_normalLItShader;
 
 	Mesh				m_quadMesh;
 	glm::mat4			m_quadTransform;

@@ -106,10 +106,12 @@ void ComputerGraphicsApp::draw() {
 	//Draw the bunny up in BunnyLoader
 	//BunnyDraw(pv * m_bunnyTransform);
 
-	PhongDraw(pv * m_frogTransform, m_frogTransform);
+	OBJDraw(pv, m_spearTransform, m_spearMesh);
+
+	//PhongDraw(pv * m_spearTransform, m_spearTransform);
 
 
-	glm::mat4& currentShape = m_frogTransform;
+	glm::mat4& currentShape = m_spearTransform;
 	if(m_shapeRotAxis != glm::vec3(0))
 	{
 		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
@@ -139,6 +141,15 @@ void ComputerGraphicsApp::draw() {
 
 bool ComputerGraphicsApp::LaunchShaders()
 {
+	m_normalLItShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/normalLit.vert");
+	m_normalLItShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/normalLit.frag");
+	if (m_normalLItShader.link() == false)
+	{
+		printf("NormalLit shader Error: %s\n", m_normalLItShader.getLastError());
+		return false;
+	}
 	// used for loading in a simple quad
 	if (!QuadLoader())
 	{
@@ -181,10 +192,10 @@ bool ComputerGraphicsApp::LaunchShaders()
 		return false;
 	}
 			
-	if (!FrogLoader())
-	{
-		return false;
-	}
+	//if (!FrogLoader())
+	//{
+	//	return false;
+	//}
 
 
 	return true;
@@ -625,16 +636,6 @@ void ComputerGraphicsApp::BunnyDraw(glm::mat4 pvm)
 
 bool ComputerGraphicsApp::SpearLoader()
 {
-	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
-		"./shaders/textured.vert");
-	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
-		"./shaders/textured.frag");
-	if (m_phongShader.link() == false)
-	{
-		printf("Color shader Error: %s\n", m_phongShader.getLastError());
-		return false;
-	}
-
 	if (m_spearMesh.load("./soulspear/soulspear.obj",true,true) == false)
 	{
 		printf("Soulspear Mesh Error!\n");
@@ -649,16 +650,28 @@ bool ComputerGraphicsApp::SpearLoader()
 	return true;
 }
 
-void ComputerGraphicsApp::SpearDraw(glm::mat4 pvm)
+void ComputerGraphicsApp::OBJDraw(glm::mat4& pv, glm::mat4& transform, aie::OBJMesh& objMesh)
 {
-	m_colourShader.bind();
-
-	m_colourShader.bindUniform("ProjectionViewModel", pvm);
-	
-	m_colourShader.bindUniform("BaseColour", glm::vec4(1));
+	m_normalLItShader.bind();
 
 
-	m_spearMesh.draw();
+	m_normalLItShader.bindUniform("CameraPosition",
+		glm::vec3(m_viewMatrix[3]));
+
+	//Bind the direction light we defind
+	m_normalLItShader.bindUniform("LightDirection", m_light.direction);
+	m_normalLItShader.bindUniform("AmbientColour", m_ambientLight);
+	m_normalLItShader.bindUniform("LightColour", m_light.colour);
+
+	// Bind texture location
+	m_normalLItShader.bindUniform("diffuseTexture", 0);
+
+	m_normalLItShader.bindUniform("ProjectionViewModel", pv * transform);
+
+	// bind the transofrm using the one provided
+	m_normalLItShader.bindUniform("ModelMatrix", transform);
+
+	objMesh.draw();
 }
 
 bool ComputerGraphicsApp::FrogLoader()
@@ -707,7 +720,7 @@ void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform)
 	// bind the transofrm using the one provided
 	m_phongShader.bindUniform("ModelMatrix", transform);
 
-	m_frogMesh.draw();
+	m_spearMesh.draw();
 }
 
 void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform, Mesh& mesh)
