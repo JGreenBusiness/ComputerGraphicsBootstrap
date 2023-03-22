@@ -24,9 +24,7 @@ bool ComputerGraphicsApp::startup() {
 	// initialise gizmo primitive counts
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-	m_flyCamera = new FlyCamera();
-	m_camera = m_flyCamera;
-	m_light = Light();
+	m_camera = new FlyCamera();
 
 	m_camera->SetPosition(glm::vec3(0, 0, 1));
 
@@ -38,15 +36,21 @@ bool ComputerGraphicsApp::startup() {
 		//glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 
-	m_light.colour = { 1,1,0 };
 	m_ambientLight = { .5f,.5f,.5f };
+	Light light;
+	light.colour = { .2f,.2f,.2f };
+	light.direction = { 1,-1,1 };
+
+	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(), getWindowHeight()),
+		light, m_ambientLight);
+
+	m_scene->AddPointLights(glm::vec3(5,3,0),glm::vec3(1,0,0),10);
+	m_scene->AddPointLights(glm::vec3(-5,3,0),glm::vec3(0,0,1),10);
 
 	m_shapeRot = 0;
 	m_shapeRotAxis = glm::vec3(0,1,0);
 	
 	m_isTextured = 0;
-
-
 
 	return LaunchShaders();
 }
@@ -56,6 +60,11 @@ void ComputerGraphicsApp::shutdown()
 	if (m_camera != nullptr)
 	{
 		delete m_camera;
+	}
+
+	if (m_scene != nullptr)
+	{
+		delete m_scene;
 	}
 	Gizmos::destroy();
 }
@@ -91,7 +100,7 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	float time = getTime();
 
 	// Rotate the light to emulate a 'day/night' cycle
-	m_light.direction = 
+	m_scene->GetLight().direction =
 		glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2),0));
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
@@ -111,6 +120,7 @@ void ComputerGraphicsApp::draw() {
 
 	auto pv = m_projectionMatrix * m_viewMatrix ;
 	
+	m_scene->Draw();
 	// Draws he quad setup in QuadLoader
 	//QuadDraw(pv * m_quadTransform);
 		
@@ -118,20 +128,20 @@ void ComputerGraphicsApp::draw() {
 	//BunnyDraw(pv * m_bunnyTransform);
 
 	//Draws the spear with light texture
-	OBJDraw(pv, m_spearTransform, m_spearMesh);
+	//OBJDraw(pv, m_spearTransform, m_spearMesh);
 
 
-	OBJDraw(pv, m_gunTransform, m_gunMesh);
+	//OBJDraw(pv, m_gunTransform, m_gunMesh);
 
 
 	//PhongDraw(pv * m_spearTransform, m_spearTransform);
 
 
-	glm::mat4& currentShape = m_spearTransform;
-	if(m_shapeRotAxis != glm::vec3(0))
-	{
-		currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
-	}
+	//glm::mat4& currentShape = m_spearTransform;
+	//if(m_shapeRotAxis != glm::vec3(0))
+	//{
+	//	currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
+	//}
 	// Draws the Box setup in BoxLoader
 	//SimpleDraw(pv * m_boxTransform, m_boxMesh);
 	
@@ -167,56 +177,60 @@ bool ComputerGraphicsApp::LaunchShaders()
 		return false;
 	}
 	// used for loading in a simple quad
-	if (!QuadLoader())
-	{
-		return false;
-	}
+	//if (!QuadLoader())
+	//{
+	//	return false;
+	//}
 
-	// used for loading in an OBJ bunny
-	if (!BunnyLoader())
-	{
-		return false;
-	}
+	//// used for loading in an OBJ bunny
+	//if (!BunnyLoader())
+	//{
+	//	return false;
+	//}
 
-	if (!BoxLoader())
-	{
-		return false;
-	}
+	//if (!BoxLoader())
+	//{
+	//	return false;
+	//}
 
-	if (!DiskLoader())
-	{
-		return false;
-	}
+	//if (!DiskLoader())
+	//{
+	//	return false;
+	//}
 
-	if (!PyramidLoader())
-	{
-		return false;
-	}
-	
-	if (!ConeLoader())
-	{
-		return false;
-	}
-		
-	if (!TexturedQuadLoader())
-	{
-		return false;
-	}
+	//if (!PyramidLoader())
+	//{
+	//	return false;
+	//}
+	//
+	//if (!ConeLoader())
+	//{
+	//	return false;
+	//}
+	//	
+	//if (!TexturedQuadLoader())
+	//{
+	//	return false;
+	//}
 			
 	if (!SpearLoader())
 	{
 		return false;
 	}
 			
-	if (!GunLoader())
+	/*if (!GunLoader())
 	{
 		return false;
+	}*/
+	
+
+	for (int i = 0; i < 10; i++)
+	{
+		m_scene->AddInstance(new Instance(glm::vec3(i*2,0,0),glm::vec3(0,i*30,0),
+			glm::vec3(1,1,1), &m_spearMesh, &m_shader));
 	}
 
-	SimpleCamera* cameraTest = new FlyCamera();
-
-	m_scene = new Scene(cameraTest, glm::vec2(getWindowWidth(),getWindowHeight()),
-		m_light, m_ambientLight);
+	
 
 	return true;
 }
@@ -225,9 +239,9 @@ void ComputerGraphicsApp::ImGUIRefresher()
 {
 	ImGui::Begin("Light Settings");
 	ImGui::DragFloat3("Global Light Colour", 
-		&m_light.colour[0],0.1f,0,1);
+		&m_scene->GetLight().colour[0], 0.1f, 0, 1);
 	ImGui::DragFloat3("Glabal Light Direction",
-		&m_light.direction[0],0.1f, 01,1);
+		&m_scene->GetLight().direction[0],0.1f, 01,1);
 	ImGui::End();
 	
 ImGui::Begin("Box Rot Settings");
@@ -679,9 +693,9 @@ void ComputerGraphicsApp::OBJDraw(glm::mat4& pv, glm::mat4& transform, aie::OBJM
 		glm::vec3(m_viewMatrix[3]));
 
 	//Bind the direction light we defind
-	m_shader.bindUniform("LightDirection", m_light.direction);
+	m_shader.bindUniform("LightDirection", m_scene->GetLight().direction);
 	m_shader.bindUniform("AmbientColour", m_ambientLight);
-	m_shader.bindUniform("LightColour", m_light.colour);
+	m_shader.bindUniform("LightColour", m_scene->GetLight().colour);
 
 	// Bind texture location
 	m_shader.bindUniform("diffuseTexture", 0);
@@ -693,6 +707,24 @@ void ComputerGraphicsApp::OBJDraw(glm::mat4& pv, glm::mat4& transform, aie::OBJM
 
 	objMesh.draw();
 }
+
+bool ComputerGraphicsApp::OBJLoader(aie::OBJMesh& objMesh, glm::mat4& transform, float scale, const char* filepath, const char* filename, bool flipTexture)
+{
+	std::string path = filepath;
+	path += filename;
+
+	if (objMesh.load(path.c_str(), true, flipTexture) == false)
+	{
+		std::string error = filename;
+		error += " Mesh Error!\n";
+		printf(error.c_str());
+		return false;
+	}
+	m_OBJTransform = transform;
+
+	return true;
+}
+
 
 bool ComputerGraphicsApp::GunLoader()
 {
@@ -720,9 +752,9 @@ void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform)
 		glm::vec3(glm::inverse(m_viewMatrix)[3]));
 
 	//Bind the direction light we defind
-	m_phongShader.bindUniform("LightDirection", m_light.direction);
+	m_phongShader.bindUniform("LightDirection", m_scene->GetLight().direction);
 	m_phongShader.bindUniform("AmbientColour", m_ambientLight);
-	m_phongShader.bindUniform("LightColour", m_light.colour);
+	m_phongShader.bindUniform("LightColour", m_scene->GetLight().colour);
 
 	// bind the pvm using the one provided
 	m_phongShader.bindUniform("ProjectionViewModel", pvm);
@@ -743,9 +775,9 @@ void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform, Mesh& me
 		glm::vec3(glm::inverse(m_viewMatrix)[3]));
 
 	//Bind the direction light we defind
-	m_phongShader.bindUniform("LightDirection", m_light.direction);
+	m_phongShader.bindUniform("LightDirection", m_scene->GetLight().direction);
 	m_phongShader.bindUniform("AmbientColour", m_ambientLight);
-	m_phongShader.bindUniform("LightColour", m_light.colour);
+	m_phongShader.bindUniform("LightColour", m_scene->GetLight().colour);
 
 	// bind the pvm using the one provided
 	m_phongShader.bindUniform("ProjectionViewModel", pvm);

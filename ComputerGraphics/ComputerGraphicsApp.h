@@ -47,7 +47,10 @@ protected:
 
 	// For Textured OBJs
 	void OBJDraw(glm::mat4& pvm, glm::mat4& Transform, aie::OBJMesh& objMesh);
-	
+	bool OBJLoader(aie::OBJMesh& objMesh, glm::mat4& transofrm,
+		float scale, const char* filepath, const char* filename,
+		bool flipTexture);
+
 	bool GunLoader();
 
 	void PhongDraw(glm::mat4 pvm, glm::mat4 transform);
@@ -105,10 +108,11 @@ protected:
 	glm::vec3		m_shapeRotAxis;
 	float			m_shapeRot;
 
+	glm::mat4		m_OBJTransform;
+
 	SimpleCamera*	m_camera;
 	FlyCamera*		m_flyCamera;
 
-	Light m_light;
 	glm::vec3 m_ambientLight;
 
 

@@ -6,9 +6,19 @@
 #include "SimpleCamera.h"
 #include "ComputerGraphicsApp.h"
 
-Instance::Instance(glm::mat4 transform, aie::OBJMesh* mesh, aie::ShaderProgram* shader)
+Instance::Instance(glm::mat4 transform, aie::OBJMesh* mesh, aie::ShaderProgram* shader):
+	m_transform(transform), m_mesh(mesh), m_shader(shader)
 {
+
 }
+
+Instance::Instance(glm::vec3 position, glm::vec3 eularAngles, glm::vec3 scale, aie::OBJMesh* mesh, aie::ShaderProgram* shader):
+	 m_mesh(mesh), m_shader(shader)
+{
+	m_transform = MakeTransform(position, eularAngles, scale);
+}
+
+
 
 void Instance::Draw(Scene* scene)
 {
@@ -24,15 +34,29 @@ void Instance::Draw(Scene* scene)
 	m_shader->bindUniform("ModelMatrix", m_transform);
 	m_shader->bindUniform("ProjectionViewModel", pvm);
 
-	m_shader->bindUniform("CameraPosition",glm::vec3(
-		glm::inverse(scene->GetCamera()->GetViewMatrix())[3]));
+	m_shader->bindUniform("CameraPosition",scene->GetCamera()->GetPosition());
+
+	int numberOfLights = scene->GetNumberOfLights();
+	m_shader->bindUniform("numLights", numberOfLights);
+	m_shader->bindUniform("PointlightPositions", numberOfLights,
+		scene->GetPointLightPositions());
+	m_shader->bindUniform("PointLightColours", numberOfLights,
+		scene->GetPointLightColours());
 
 	//Bind the direction light we defind
 	m_shader->bindUniform("LightDirection", scene->GetLight().direction);
 	m_shader->bindUniform("AmbientColour", scene->GetLight().colour);
 	m_shader->bindUniform("LightColour", scene->GetAmbienColourLight());
 
+	m_mesh->draw();
+}
 
-
-
+glm::mat4 Instance::MakeTransform(glm::vec3 position, glm::vec3 eularAngles, glm::vec3 scale)
+{
+	return glm::translate(glm::mat4(1), position)
+		* glm::rotate(glm::mat4(1),glm::radians(eularAngles.z), glm::vec3(0, 0, 1))
+		* glm::rotate(glm::mat4(1),glm::radians(eularAngles.y), glm::vec3(0, 1, 0))
+		* glm::rotate(glm::mat4(1),glm::radians(eularAngles.x), glm::vec3(1, 0, 0))
+		* glm::scale(glm::mat4(1), scale);
+		
 }
