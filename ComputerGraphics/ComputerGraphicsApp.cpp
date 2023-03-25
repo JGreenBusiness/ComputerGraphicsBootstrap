@@ -31,6 +31,7 @@ bool ComputerGraphicsApp::startup() {
 	m_camera = m_stillCamera;
 
 	m_camPos = glm::vec3(0, 0, 1);
+	m_camRot = glm::vec3(0);
 	m_camera->SetPosition(m_camPos);
 
 
@@ -109,6 +110,7 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	// Rotate the light to emulate a 'day/night' cycle
 	m_scene->GetLight().direction =
 		glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2),0));
+
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -261,12 +263,15 @@ ImGui::Begin("Box Rot Settings");
 
 	m_camPos = m_camera->GetPosition();
 	ImGui::Begin("Camera Settings");
-	ImGui::DragFloat3("Camera Axis",
+	ImGui::DragFloat3("Camera Pos",
 		&m_camPos[0], 1, 0, 1000);
+	ImGui::DragFloat3("Camera Rot",
+		&m_camRot[0], 1, -360, 360);
 	ImGui::Checkbox("EnableFlyCam",
 		&m_enableFlyCam);
 	ImGui::End();
 
+	m_stillCamera->SetRotation(m_camRot);
 	m_camera->SetWorldTransform(m_camera->GetWorldTransform(m_camPos, glm::vec3(0), glm::vec3(1)));
 
 	if (m_camera != m_flyCamera && m_enableFlyCam)

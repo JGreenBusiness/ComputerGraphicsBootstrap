@@ -20,7 +20,7 @@ public:
 
 	float GetAspectRatio() { return m_aspectRatio; }
 
-	void SetPosition(glm::vec3 pos) { pos = m_position; };
+	void SetPosition(glm::vec3 pos) { pos = m_position; }
 	void SetAspectRatio(float width, float height) 
 		{ m_aspectRatio = width / height; }
 	void SetViewMatrix(glm::vec3 from, glm::vec3 to, glm::vec3 up);

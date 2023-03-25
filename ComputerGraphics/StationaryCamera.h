@@ -6,7 +6,7 @@ public:
 	StationaryCamera();
 	~StationaryCamera();
 	
-	void SetRotation(glm::vec3 rotation);
+	void SetRotation(glm::vec3 eularAngles);
 protected:
 private:
 	

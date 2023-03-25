@@ -118,6 +118,7 @@ protected:
 	bool m_enableFlyCam;
 
 	glm::vec3 m_camPos;
+	glm::vec3 m_camRot;
 
 	glm::vec3 m_ambientLight;
 	Light* m_mainLight;
