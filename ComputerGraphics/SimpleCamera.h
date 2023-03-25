@@ -28,7 +28,7 @@ public:
 		float near, float far);
 	void SetProjectionMatrix(float feildOfView, float width,
 		float height,float near, float far);
-
+	void SetWorldTransform(glm::mat4 _transform) { m_worldTransoform = _transform; }
 
 
 protected:

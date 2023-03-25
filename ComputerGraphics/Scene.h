@@ -51,6 +51,7 @@ public:
 	glm::vec3* GetPointLightPositions() { return &m_pointLightPositions[0];}
 	glm::vec3* GetPointLightColours() { return &m_pointLightPositions[0];}
 
+	void SetCamera(SimpleCamera* camera) { m_camera = camera; }
 
 protected:
 	SimpleCamera* m_camera;

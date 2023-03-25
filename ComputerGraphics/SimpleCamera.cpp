@@ -48,9 +48,9 @@ glm::mat4 SimpleCamera::GetWorldTransform(glm::vec3 position, glm::vec3 eularAng
 	mat[2] = glm::vec4(		0			, 0			, scale.z		,0);
 	mat[3] = glm::vec4(		position.x	, position.y, position.z	,1);
 
-	mat = glm::rotate(mat, glm::radians(eularAngles.x), glm::vec3(1, 0, 0));
-	mat = glm::rotate(mat, glm::radians(eularAngles.y), glm::vec3(0, 1, 0));
 	mat = glm::rotate(mat, glm::radians(eularAngles.z), glm::vec3(0, 0, 1));
+	mat = glm::rotate(mat, glm::radians(eularAngles.y), glm::vec3(0, 1, 0));
+	mat = glm::rotate(mat, glm::radians(eularAngles.x), glm::vec3(1, 0, 0));
 	return mat;
 }
 

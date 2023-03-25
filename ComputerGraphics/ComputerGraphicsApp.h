@@ -10,6 +10,7 @@
 #include <glm/vec4.hpp>
 #include <vector>
 #include "FlyCamera.h"
+#include "StationaryCamera.h"
 #include "Texture.h"
 #include "Scene.h"
 #include "Instance.h"
@@ -110,10 +111,16 @@ protected:
 
 	glm::mat4		m_OBJTransform;
 
-	SimpleCamera*	m_camera;
-	FlyCamera*		m_flyCamera;
+	SimpleCamera*		m_camera;
+	FlyCamera*			m_flyCamera;
+	StationaryCamera*	m_stillCamera;
+
+	bool m_enableFlyCam;
+
+	glm::vec3 m_camPos;
 
 	glm::vec3 m_ambientLight;
+	Light* m_mainLight;
 
 
 };

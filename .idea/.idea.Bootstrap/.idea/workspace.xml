@@ -6,12 +6,7 @@
     <projectFile>ComputerGraphics/ComputerGraphics.vcxproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="26917ead-ef74-45be-962f-2bc4a4100a75" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Bootstrap/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Bootstrap/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ComputerGraphics/ComputerGraphicsApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/ComputerGraphics/ComputerGraphicsApp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ComputerGraphics/ComputerGraphicsApp.h" beforeDir="false" afterPath="$PROJECT_DIR$/ComputerGraphics/ComputerGraphicsApp.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/bin/imgui.ini" afterDir="false" />
-    </list>
+    <list default="true" id="26917ead-ef74-45be-962f-2bc4a4100a75" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -193,6 +188,7 @@
       <workItem from="1679113198065" duration="3033000" />
       <workItem from="1679181365342" duration="8119000" />
       <workItem from="1679195349830" duration="3743000" />
+      <workItem from="1679542424385" duration="39000" />
     </task>
     <servers />
   </component>

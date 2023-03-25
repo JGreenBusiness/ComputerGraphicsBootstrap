@@ -24,9 +24,15 @@ bool ComputerGraphicsApp::startup() {
 	// initialise gizmo primitive counts
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-	m_camera = new FlyCamera();
 
-	m_camera->SetPosition(glm::vec3(0, 0, 1));
+	m_flyCamera = new FlyCamera();
+	m_stillCamera = new StationaryCamera();
+	m_enableFlyCam = false;
+	m_camera = m_stillCamera;
+
+	m_camPos = glm::vec3(0, 0, 1);
+	m_camera->SetPosition(m_camPos);
+
 
 	// create simple camera transforms
 	m_viewMatrix = m_camera->GetViewMatrix();
@@ -37,12 +43,13 @@ bool ComputerGraphicsApp::startup() {
 
 
 	m_ambientLight = { .5f,.5f,.5f };
-	Light light;
-	light.colour = { .2f,.2f,.2f };
-	light.direction = { 1,-1,1 };
+
+	m_mainLight = new Light();
+	m_mainLight->colour = { .2f,.2f,.2f };
+	m_mainLight->direction = { 1,-1,1 };
 
 	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(), getWindowHeight()),
-		light, m_ambientLight);
+		*m_mainLight, m_ambientLight);
 
 	m_scene->AddPointLights(glm::vec3(5,3,0),glm::vec3(1,0,0),10);
 	m_scene->AddPointLights(glm::vec3(-5,3,0),glm::vec3(0,0,1),10);
@@ -251,6 +258,27 @@ ImGui::Begin("Box Rot Settings");
 		&m_shapeRot,0.01f, -1.0f,1);
 	ImGui::End();
 
+
+	m_camPos = m_camera->GetPosition();
+	ImGui::Begin("Camera Settings");
+	ImGui::DragFloat3("Camera Axis",
+		&m_camPos[0], 1, 0, 1000);
+	ImGui::Checkbox("EnableFlyCam",
+		&m_enableFlyCam);
+	ImGui::End();
+
+	m_camera->SetWorldTransform(m_camera->GetWorldTransform(m_camPos, glm::vec3(0), glm::vec3(1)));
+
+	if (m_camera != m_flyCamera && m_enableFlyCam)
+	{
+		m_camera = m_flyCamera;
+		m_scene->SetCamera(m_camera);
+	}
+	else if(m_camera != m_stillCamera && !m_enableFlyCam)
+	{
+		m_camera = m_stillCamera;
+		m_scene->SetCamera(m_camera);
+	}
 	
 ;}
 
