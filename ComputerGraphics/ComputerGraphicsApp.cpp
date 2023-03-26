@@ -222,21 +222,26 @@ bool ComputerGraphicsApp::LaunchShaders()
 	//	return false;
 	//}
 			
-	if (!SpearLoader())
+	/*if (!SpearLoader())
 	{
 		return false;
-	}
+	}*/
 			
 	/*if (!GunLoader())
 	{
 		return false;
 	}*/
 	
+	if (!OBJLoader(m_spearMesh, m_spearTransform,1.0f,
+		"./soulspear/", "soulspear.obj", false))
+	{
+		return false;
+	}
 
 	for (int i = 0; i < 10; i++)
 	{
 		m_scene->AddInstance(new Instance(glm::vec3(i*2,0,0),glm::vec3(0,i*30,0),
-			glm::vec3(1,1,1), &m_spearMesh, &m_shader));
+			glm::vec3(1,10,1), &m_spearMesh, &m_shader));
 	}
 
 	
@@ -753,7 +758,14 @@ bool ComputerGraphicsApp::OBJLoader(aie::OBJMesh& objMesh, glm::mat4& transform,
 		printf(error.c_str());
 		return false;
 	}
-	m_OBJTransform = transform;
+
+	
+	transform = {
+		scale, 0, 0, 0,
+		0, scale, 0, 0,
+		0, 0, scale, 0,
+		0, 0, 0, 1
+	};
 
 	return true;
 }
