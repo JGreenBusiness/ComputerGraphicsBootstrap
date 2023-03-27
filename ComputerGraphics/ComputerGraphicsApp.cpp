@@ -136,17 +136,34 @@ void ComputerGraphicsApp::draw()
 	
 	m_scene->Draw();
 
+	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_flyCamera->GetPosition());
+	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_stillCamera->GetPosition());
+	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_pointLight1->direction);
+	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_pointLight2->direction);
+
+
+	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
+
 	// Unbind the target to return to the backbuffer
 	m_renderTarget.unbind();
 
 	clearScreen();
 
-	m_scene->Draw();
+	
 
 	// Bind Post Processing Shader and the texture
 	m_postProcessShader.bind();
 	m_postProcessShader.bindUniform("colourTarget",0);
+	m_postProcessShader.bindUniform("postProcessTarget", m_postProcessEffect);
+	m_postProcessShader.bindUniform("windowWidth", (int) getWindowWidth());
+	m_postProcessShader.bindUniform("windowHeight", (int) getWindowHeight());
+
 	m_renderTarget.getTarget(0).bind(0);
+
+
+	
+	
+
 
 	m_fullScreenQuad.Draw();
 	
@@ -192,13 +209,7 @@ void ComputerGraphicsApp::draw()
 
 	//SpearDraw(pv * m_spearTransform);
 
-	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_flyCamera->GetPosition());
-	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_stillCamera->GetPosition());
-	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_pointLight1->direction);
-	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_pointLight2->direction);
-
-
-	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
+	
 }
 
 

@@ -79,6 +79,8 @@ protected:
 	aie::ShaderProgram	m_normalShader;
 	aie::ShaderProgram	m_postProcessShader;
 
+	int m_postProcessEffect = 5;
+
 	aie::RenderTarget	m_renderTarget;
 
 	Mesh				m_quadMesh;
