@@ -43,17 +43,18 @@ bool ComputerGraphicsApp::startup() {
 		//glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 
-	m_ambientLight = { .5f,.5f,.5f };
 
-	m_mainLight = new Light();
-	m_mainLight->colour = { .2f,.2f,.2f };
-	m_mainLight->direction = { 1,-1,1 };
+	m_mainLight = new Light(glm::vec3(1,-1,1),glm::vec3(0),1);
+
+	m_ambientLight = { .5f,.5f,.5f };
 
 	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(), getWindowHeight()),
 		*m_mainLight, m_ambientLight);
 
-	m_scene->AddPointLights(glm::vec3(5,3,0),glm::vec3(1,0,0),10);
-	m_scene->AddPointLights(glm::vec3(-5,3,0),glm::vec3(0,0,1),10);
+	m_pointLight1 = new Light(glm::vec3(5, 10, 0), glm::vec3(1, 0, 0), 20);
+	m_pointLight2 = new Light(glm::vec3(8, 10, 0), glm::vec3(0, 0, 1), 20);
+	m_scene->AddPointLights(*m_pointLight1);
+	m_scene->AddPointLights(*m_pointLight2);
 
 	m_shapeRot = 0;
 	m_shapeRotAxis = glm::vec3(0,1,0);
@@ -168,6 +169,12 @@ void ComputerGraphicsApp::draw() {
 
 	//SpearDraw(pv * m_spearTransform);
 
+	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_flyCamera->GetPosition());
+	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_stillCamera->GetPosition());
+	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_pointLight1->direction);
+	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_pointLight2->direction);
+	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_mainLight->direction);
+
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 }
@@ -197,10 +204,10 @@ bool ComputerGraphicsApp::LaunchShaders()
 	//	return false;
 	//}
 
-	//if (!BoxLoader())
-	//{
-	//	return false;
-	//}
+	if (!BoxLoader())
+	{
+		return false;
+	}
 
 	//if (!DiskLoader())
 	//{
@@ -222,26 +229,26 @@ bool ComputerGraphicsApp::LaunchShaders()
 	//	return false;
 	//}
 			
-	/*if (!SpearLoader())
+	if (!SpearLoader())
 	{
 		return false;
-	}*/
+	}
 			
 	/*if (!GunLoader())
 	{
 		return false;
 	}*/
 	
-	if (!OBJLoader(m_spearMesh, m_spearTransform,1.0f,
-		"./soulspear/", "soulspear.obj", false))
-	{
-		return false;
-	}
+	//if (!OBJLoader(m_spearMesh, m_spearTransform,1.0f,
+	//	"./soulspear/", "soulspear.obj", false))
+	//{
+	//	return false;
+	//}
 
 	for (int i = 0; i < 10; i++)
 	{
 		m_scene->AddInstance(new Instance(glm::vec3(i*2,0,0),glm::vec3(0,i*30,0),
-			glm::vec3(1,10,1), &m_spearMesh, &m_shader));
+			glm::vec3(1,1,1), &m_spearMesh, &m_shader));
 	}
 
 	
@@ -253,9 +260,9 @@ void ComputerGraphicsApp::ImGUIRefresher()
 {
 	ImGui::Begin("Light Settings");
 	ImGui::DragFloat3("Global Light Colour", 
-		&m_scene->GetLight().colour[0], 0.1f, 0, 1);
+		&m_mainLight->colour[0], 0.1f, 0, 1);
 	ImGui::DragFloat3("Glabal Light Direction",
-		&m_scene->GetLight().direction[0],0.1f, 01,1);
+		&m_mainLight->direction[0],0.1f, 01,1);
 	ImGui::End();
 	
 ImGui::Begin("Box Rot Settings");
@@ -365,13 +372,12 @@ bool ComputerGraphicsApp::TexturedQuadLoader()
 
 bool ComputerGraphicsApp::BoxLoader()
 {
-	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
-		"./shaders/Phong.vert");
-	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
-		"./shaders/Phong.frag");
-	if (m_phongShader.link() == false)
+	m_simpleShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
+	m_simpleShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
+
+	if (m_simpleShader.link() == false)
 	{
-		printf("Color shader Error: %s\n", m_phongShader.getLastError());
+		printf("Simple Shader has an Error: %s\n", m_simpleShader.getLastError());
 		return false;
 	}
 
@@ -412,9 +418,9 @@ bool ComputerGraphicsApp::BoxLoader()
 	// This is a 10 'unit' wide quad
 	m_boxTransform =
 	{
-		10,0,0,0,
-		0,10,0,0,
-		0,0,10,0,
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
 		0,0,0,1
 	};
 
@@ -668,6 +674,20 @@ void ComputerGraphicsApp::TexturedQuadDraw(glm::mat4 pvm)
 	m_gridTexture.bind(0);
 
 	m_texturedQuadMesh.Draw();
+}
+
+void ComputerGraphicsApp::DrawGizmo(glm::mat4 projectionView,glm::mat4 transform 
+	, Mesh& gizmoMesh,glm::vec3 position)
+{
+	glm::mat4 mat
+	{
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		position.x,position.y,position.z,1
+	};
+
+	SimpleDraw(projectionView*(transform*mat), gizmoMesh);
 }
 
 bool ComputerGraphicsApp::BunnyLoader()

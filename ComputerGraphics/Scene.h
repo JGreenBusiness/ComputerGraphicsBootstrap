@@ -38,7 +38,10 @@ public:
 
 	void Draw();
 
-	void AddPointLights(Light light) {m_pointLights.push_back(light);}
+	void AddPointLights(Light light) 
+	{
+		m_pointLights.push_back(light);
+	}
 	void AddPointLights(glm::vec3 direction, glm::vec3 colour, float intensity)
 		{m_pointLights.push_back(Light(direction,colour, intensity));}
 
@@ -49,7 +52,7 @@ public:
 	std::vector<Light> GetLights() { return m_pointLights; }
 	int GetNumberOfLights() { return m_pointLights.size(); }
 	glm::vec3* GetPointLightPositions() { return &m_pointLightPositions[0];}
-	glm::vec3* GetPointLightColours() { return &m_pointLightPositions[0];}
+	glm::vec3* GetPointLightColours() { return &m_pointLightColours[0];}
 
 	void SetCamera(SimpleCamera* camera) { m_camera = camera; }
 

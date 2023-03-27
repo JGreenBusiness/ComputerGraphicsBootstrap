@@ -37,14 +37,14 @@ uniform vec3 LightDirection;
 
 vec3 Diffuse(vec3 direction, vec3 colour, vec3 normal)
 {
-    return colour * max(0,dot(normal,-direction));
+    return colour * max(0, dot(normal, -direction));
 }
 
 vec3 Specular(vec3 direction, vec3 colour, vec3 normal, vec3 view)
 {
     vec3 R = reflect(direction,normal);
     
-    float specularTerm = pow(max(0,dot(R,view)),Ns);
+    float specularTerm = pow(max(0, dot(R, view)), Ns);
 
     return specularTerm * colour;
 }
@@ -61,9 +61,9 @@ void main()
 
     vec3 texDiffuse = texture(diffuseTexture, vTexCoord).rgb;
     vec3 texSpecular = texture(specularTexture, vTexCoord).rgb;
-    vec3 TexNormal = texture(normalTexture, vTexCoord).rgb;
+    vec3 texNormal = texture(normalTexture, vTexCoord).rgb;
 
-    N = TBN * (TexNormal * 2 - 1);
+    N = normalize(TBN * (texNormal * 2 - 1));
 
     // Calculate the negative light drection (Lambert Term)
     float lambertTerm = max(0,min(1,dot(N,-L)));

@@ -6,10 +6,11 @@
 #include "SimpleCamera.h"
 #include "ComputerGraphicsApp.h"
 
-Instance::Instance(glm::mat4 transform, aie::OBJMesh* mesh, aie::ShaderProgram* shader):
-	m_transform(transform), m_mesh(mesh), m_shader(shader)
+Instance::Instance(glm::mat4 transform, aie::OBJMesh* mesh, aie::ShaderProgram* shader)//:m_transform(transform), m_mesh(mesh), m_shader(shader)
 {
-
+	m_transform = transform;
+	m_mesh = mesh;
+	m_shader = shader;
 }
 
 Instance::Instance(glm::vec3 position, glm::vec3 eularAngles, glm::vec3 scale, aie::OBJMesh* mesh, aie::ShaderProgram* shader):
@@ -31,8 +32,8 @@ void Instance::Draw(Scene* scene)
 		scene->GetCamera()->GetViewMatrix()*m_transform;
 
 	// bind the transofrm using the one provided
-	m_shader->bindUniform("ModelMatrix", m_transform);
 	m_shader->bindUniform("ProjectionViewModel", pvm);
+	m_shader->bindUniform("ModelMatrix", m_transform);
 
 	m_shader->bindUniform("CameraPosition",scene->GetCamera()->GetPosition());
 
@@ -45,8 +46,8 @@ void Instance::Draw(Scene* scene)
 
 	//Bind the direction light we defind
 	m_shader->bindUniform("LightDirection", scene->GetLight().direction);
-	m_shader->bindUniform("AmbientColour", scene->GetLight().colour);
-	m_shader->bindUniform("LightColour", scene->GetAmbienColourLight());
+	m_shader->bindUniform("LightColour", scene->GetLight().colour);
+	m_shader->bindUniform("AmbientColour", scene->GetAmbienColourLight());
 
 	m_mesh->draw();
 }

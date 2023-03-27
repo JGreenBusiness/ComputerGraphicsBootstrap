@@ -59,6 +59,9 @@ protected:
 	void SimpleDraw(glm::mat4 pvm, Mesh& mesh);
 	void TexturedQuadDraw(glm::mat4 pvm);
 
+	void DrawGizmo(glm::mat4 projectionView, glm::mat4 transform, Mesh& gizmoMesh,
+		glm::vec3 position);
+
 	Scene*		m_scene;
 
 	// camera transforms
@@ -122,6 +125,8 @@ protected:
 
 	glm::vec3 m_ambientLight;
 	Light* m_mainLight;
+	Light* m_pointLight1;
+	Light* m_pointLight2;
 
 
 };
