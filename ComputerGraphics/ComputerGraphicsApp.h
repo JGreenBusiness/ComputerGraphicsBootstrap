@@ -76,11 +76,13 @@ protected:
 	aie::ShaderProgram	m_colourShader;
 	aie::ShaderProgram	m_phongShader;
 	aie::ShaderProgram	m_texturedShader;
-	aie::ShaderProgram	m_shader;
+	aie::ShaderProgram	m_normalShader;
+	aie::ShaderProgram	m_postProcessShader;
 
-	aie::RenderTarget m_renderTarget;
+	aie::RenderTarget	m_renderTarget;
 
 	Mesh				m_quadMesh;
+	Mesh				m_fullScreenQuad;
 	glm::mat4			m_quadTransform;
 	
 	Mesh				m_texturedQuadMesh;

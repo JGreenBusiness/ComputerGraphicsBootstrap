@@ -141,8 +141,19 @@ void ComputerGraphicsApp::draw()
 
 	clearScreen();
 
+	m_scene->Draw();
+
+	// Bind Post Processing Shader and the texture
+	m_postProcessShader.bind();
+	m_postProcessShader.bindUniform("colourTarget",0);
+	m_renderTarget.getTarget(0).bind(0);
+
+	m_fullScreenQuad.Draw();
+	
+
 	// Draws he quad setup in QuadLoader
-	TexturedQuadDraw(pv * m_texturedQuadTransform);
+	//TexturedQuadDraw(pv * m_texturedQuadTransform);
+
 
 	// Draws he quad setup in QuadLoader
 	//QuadDraw(pv * m_quadTransform);
@@ -202,13 +213,25 @@ bool ComputerGraphicsApp::LaunchShaders()
 	}
 
 #pragma region LoadingShaders
-	m_shader.loadShader(aie::eShaderStage::VERTEX,
+	m_normalShader.loadShader(aie::eShaderStage::VERTEX,
 		"./shaders/normalLit.vert");
-	m_shader.loadShader(aie::eShaderStage::FRAGMENT,
+	m_normalShader.loadShader(aie::eShaderStage::FRAGMENT,
 		"./shaders/normalLit.frag");
-	if (m_shader.link() == false)
+	if (m_normalShader.link() == false)
 	{
-		printf("NormalLit shader Error: %s\n", m_shader.getLastError());
+		printf("NormalLit shader Error: %s\n", m_normalShader.getLastError());
+		return false;
+	}
+
+
+	// Post processing shader
+	m_postProcessShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/post.vert");
+	m_postProcessShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/post.frag");
+	if (m_postProcessShader.link() == false)
+	{
+		printf("post shader Error: %s\n", m_postProcessShader.getLastError());
 		return false;
 	}
 #pragma endregion
@@ -251,6 +274,9 @@ bool ComputerGraphicsApp::LaunchShaders()
 	{
 		return false;
 	}
+
+	// Create a full screen quad
+	m_fullScreenQuad.InitialiseFullscreenQuad();
 			
 	if (!SpearLoader())
 	{
@@ -271,7 +297,7 @@ bool ComputerGraphicsApp::LaunchShaders()
 	for (int i = 0; i < 10; i++)
 	{
 		m_scene->AddInstance(new Instance(glm::vec3(i*2,0,0),glm::vec3(0,i*30,0),
-			glm::vec3(1,1,1), &m_spearMesh, &m_shader));
+			glm::vec3(1,1,1), &m_spearMesh, &m_normalShader));
 	}
 
 	
@@ -769,24 +795,24 @@ bool ComputerGraphicsApp::SpearLoader()
 
 void ComputerGraphicsApp::OBJDraw(glm::mat4& pv, glm::mat4& transform, aie::OBJMesh& objMesh)
 {
-	m_shader.bind();
+	m_normalShader.bind();
 
 
-	m_shader.bindUniform("CameraPosition",
+	m_normalShader.bindUniform("CameraPosition",
 		glm::vec3(m_viewMatrix[3]));
 
 	//Bind the direction light we defind
-	m_shader.bindUniform("LightDirection", m_scene->GetLight().direction);
-	m_shader.bindUniform("AmbientColour", m_ambientLight);
-	m_shader.bindUniform("LightColour", m_scene->GetLight().colour);
+	m_normalShader.bindUniform("LightDirection", m_scene->GetLight().direction);
+	m_normalShader.bindUniform("AmbientColour", m_ambientLight);
+	m_normalShader.bindUniform("LightColour", m_scene->GetLight().colour);
 
 	// Bind texture location
-	m_shader.bindUniform("diffuseTexture", 0);
+	m_normalShader.bindUniform("diffuseTexture", 0);
 
-	m_shader.bindUniform("ProjectionViewModel", pv * transform);
+	m_normalShader.bindUniform("ProjectionViewModel", pv * transform);
 
 	// bind the transofrm using the one provided
-	m_shader.bindUniform("ModelMatrix", transform);
+	m_normalShader.bindUniform("ModelMatrix", transform);
 
 	objMesh.draw();
 }
