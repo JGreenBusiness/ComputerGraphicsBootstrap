@@ -45,11 +45,11 @@ void Mesh::InitialiseQuad()
 
 	
 	vertices[0].texCoord = { 0,1 }; // Bottom Left
-	vertices[1].texCoord = { 0,1 }; // Bottom Right
-	vertices[2].texCoord = { 0,1 }; // Top Left
-	vertices[3].texCoord = { 0,1 }; // Top Left
+	vertices[1].texCoord = { 1,1 }; // Bottom Right
+	vertices[2].texCoord = { 0,0 }; // Top Left
+	vertices[3].texCoord = { 0,0 }; // Top Left
 	vertices[4].texCoord = { 1,1 }; // Bottom Right
-	vertices[5].texCoord = { 0,1 }; // Top Right
+	vertices[5].texCoord = { 1,0 }; // Top Right
 
 
 	// Fill the vertex buffer

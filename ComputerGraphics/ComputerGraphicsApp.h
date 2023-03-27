@@ -14,6 +14,8 @@
 #include "Texture.h"
 #include "Scene.h"
 #include "Instance.h"
+#include "RenderTarget.h"
+
 
 class ComputerGraphicsApp : public aie::Application {
 public:
@@ -75,6 +77,8 @@ protected:
 	aie::ShaderProgram	m_phongShader;
 	aie::ShaderProgram	m_texturedShader;
 	aie::ShaderProgram	m_shader;
+
+	aie::RenderTarget m_renderTarget;
 
 	Mesh				m_quadMesh;
 	glm::mat4			m_quadTransform;

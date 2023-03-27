@@ -3,7 +3,6 @@
 #include "Input.h"
 #include "imgui.h"
 
-
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
@@ -119,7 +118,12 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	ImGUIRefresher();
 }
 
-void ComputerGraphicsApp::draw() {
+void ComputerGraphicsApp::draw()
+{
+	// Bind the render target as the first 
+	// part of our draw function
+	m_renderTarget.bind();
+
 
 	// wipe the screen to the background colour
 	clearScreen();
@@ -131,6 +135,15 @@ void ComputerGraphicsApp::draw() {
 	auto pv = m_projectionMatrix * m_viewMatrix ;
 	
 	m_scene->Draw();
+
+	// Unbind the target to return to the backbuffer
+	m_renderTarget.unbind();
+
+	clearScreen();
+
+	// Draws he quad setup in QuadLoader
+	TexturedQuadDraw(pv * m_texturedQuadTransform);
+
 	// Draws he quad setup in QuadLoader
 	//QuadDraw(pv * m_quadTransform);
 		
@@ -164,8 +177,7 @@ void ComputerGraphicsApp::draw() {
 	// Draws the Pyramid setup in PyramidLoader
 	//SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
 
-	// Draws he quad setup in QuadLoader
-	//TexturedQuadDraw(pv * m_texturedQuadTransform);
+	
 
 	//SpearDraw(pv * m_spearTransform);
 
@@ -173,7 +185,6 @@ void ComputerGraphicsApp::draw() {
 	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_stillCamera->GetPosition());
 	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_pointLight1->direction);
 	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_pointLight2->direction);
-	DrawGizmo(pv,m_boxTransform,m_boxMesh,m_mainLight->direction);
 
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
@@ -183,6 +194,14 @@ void ComputerGraphicsApp::draw() {
 
 bool ComputerGraphicsApp::LaunchShaders()
 {
+	if (m_renderTarget.initialise(1,getWindowWidth()
+		,getWindowHeight()) == false)
+	{
+		printf("Render Target Error\n");
+		return false;
+	}
+
+#pragma region LoadingShaders
 	m_shader.loadShader(aie::eShaderStage::VERTEX,
 		"./shaders/normalLit.vert");
 	m_shader.loadShader(aie::eShaderStage::FRAGMENT,
@@ -192,6 +211,10 @@ bool ComputerGraphicsApp::LaunchShaders()
 		printf("NormalLit shader Error: %s\n", m_shader.getLastError());
 		return false;
 	}
+#pragma endregion
+
+
+	
 	// used for loading in a simple quad
 	//if (!QuadLoader())
 	//{
@@ -224,10 +247,10 @@ bool ComputerGraphicsApp::LaunchShaders()
 	//	return false;
 	//}
 	//	
-	//if (!TexturedQuadLoader())
-	//{
-	//	return false;
-	//}
+	if (!TexturedQuadLoader())
+	{
+		return false;
+	}
 			
 	if (!SpearLoader())
 	{
@@ -671,7 +694,9 @@ void ComputerGraphicsApp::TexturedQuadDraw(glm::mat4 pvm)
 	m_texturedShader.bindUniform("diffuseTexture",0);
 
 	//Bind the texture to a specific location
-	m_gridTexture.bind(0);
+	//m_gridTexture.bind(0);
+
+	m_renderTarget.getTarget(0).bind(0);
 
 	m_texturedQuadMesh.Draw();
 }
