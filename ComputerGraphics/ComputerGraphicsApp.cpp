@@ -332,6 +332,11 @@ ImGui::Begin("Box Rot Settings");
 		&m_shapeRot,0.01f, -1.0f,1);
 	ImGui::End();
 
+ImGui::Begin("Post Processing Effect");
+ImGui::InputInt("Post Effect Index",
+	&m_postProcessEffect);
+	ImGui::End();
+
 
 	m_camPos = m_camera->GetPosition();
 	ImGui::Begin("Camera Settings");

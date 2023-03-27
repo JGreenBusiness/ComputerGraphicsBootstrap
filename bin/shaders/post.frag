@@ -67,6 +67,42 @@ vec4 EdgeDetection(vec2 texCoord)
 
 }
 
+vec4 Sepia(vec2 texCoord)
+{
+
+    vec4 texColour = texture(colourTarget,texCoord);
+
+    float rr = .3;
+    float rg = .769;
+    float rb = .189;
+    float ra = 0.0;
+    
+    float gr = .3;
+    float gg = .686;
+    float gb = .168;
+    float ga = 0.0;
+    
+    float br = .272;
+    float bg = .534;
+    float bb = .131;
+    float ba = 0.0;
+    
+    float red = (rr * texColour.r) + (rb * texColour.b) + (rg * texColour.g) + (ra * texColour.a);
+    float green = (gr * texColour.r) + (gb * texColour.b) + (gg * texColour.g) + (ga * texColour.a);
+    float blue = (br * texColour.r) + (bb * texColour.b) + (bg * texColour.g) + (ba * texColour.a);
+
+    return vec4(red,green,blue,1.0);
+}
+
+vec4 GreyScale(vec2 texCoord)
+{
+    vec4 texColour = texture(colourTarget,texCoord);
+
+    float gs = texColour.r*0.3+texColour.g*0.6+texColour.b*0.1;
+
+    return vec4(gs, gs, gs, 1.0); 
+}
+
 void main()
 {
     // This will calculate the exel size
@@ -101,7 +137,7 @@ void main()
         } 
         case 3: // Sepia
         {
-            FragColour = Default(texCoord);
+            FragColour = Sepia(texCoord);
             break;
         } 
         case 4: // Scanlines
@@ -111,7 +147,7 @@ void main()
         } 
         case 5: // Grey Scale
         { 
-            FragColour = Default(texCoord);
+            FragColour = GreyScale(texCoord);
              break;
         } 
         case 6: // Invert
