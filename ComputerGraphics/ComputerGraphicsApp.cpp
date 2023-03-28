@@ -177,10 +177,6 @@ void ComputerGraphicsApp::draw()
 	m_renderTarget.getTarget(0).bind(0);
 
 
-	
-	
-
-
 	m_fullScreenQuad.Draw();
 	
 

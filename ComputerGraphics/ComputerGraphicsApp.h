@@ -140,7 +140,7 @@ protected:
 	Light* m_pointLight2;
 
 	ParticleEmitter*		m_emitter;
-	glm::mat4			m_particlemitTransform;
+	glm::mat4				m_particlemitTransform;
 
 };
 
