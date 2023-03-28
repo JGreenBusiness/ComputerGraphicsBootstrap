@@ -54,6 +54,9 @@ void ParticleEmitter::Initialise(unsigned int _maxParticles, unsigned int _emmit
 	m_startColour = _startcolour;
 	m_endColour = _endColour;
 
+	m_startSize = _startSize;
+	m_endSize = _endSize;
+
 	m_maxParticles = _maxParticles;
 	
 	// Create a particle array
@@ -73,9 +76,9 @@ void ParticleEmitter::Initialise(unsigned int _maxParticles, unsigned int _emmit
 		indexData[i * 6]	 = i * 4;
 		indexData[i * 6 + 1] = i * 4 + 1;
 		indexData[i * 6 + 2] = i * 4 + 2;
-		indexData[i * 6 + 3] = i * 4 + 3;
-		indexData[i * 6 + 4] = i * 4 + 4;
-		indexData[i * 6 + 5] = i * 4 + 5;
+		indexData[i * 6 + 3] = i * 4 + 0;
+		indexData[i * 6 + 4] = i * 4 + 2;
+		indexData[i * 6 + 5] = i * 4 + 3;
 	}
 
 	// Time to create the OpenGl buffers!
@@ -237,7 +240,7 @@ void ParticleEmitter::Draw()
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, m_firstDead * 4 * sizeof(ParticleVertex),m_vertexData);
 	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES, m_firstDead, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_firstDead * 6, GL_UNSIGNED_INT, 0);
 
 
 }

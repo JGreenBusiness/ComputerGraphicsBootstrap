@@ -48,7 +48,8 @@ bool ComputerGraphicsApp::startup() {
 	m_ambientLight = { .5f,.5f,.5f };
 
 	m_emitter = new ParticleEmitter();
-	m_emitter->Initialise(1000,500,0.1f,1.0f,1.0f,5,1,0.1f,
+	m_emitter->Initialise(1000, 500, 0.1f, 1.0f,
+		1.0f, 5, 1, 0.1f,
 		glm::vec4(0,0,1,1), glm::vec4(0, 1, 0, 1));
 
 	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(), getWindowHeight()),
@@ -116,8 +117,7 @@ void ComputerGraphicsApp::update(float deltaTime) {
 
 	SimpleCamera* sc = m_camera;
 
-	m_emitter->Update(deltaTime, sc->
-		GetWorldTransform(sc->GetPosition(), glm::vec3(0), glm::vec3(1)));
+	m_emitter->Update(deltaTime, sc->GetWorldTransform(m_camera->GetPosition(), glm::vec3(0), glm::vec3(1)));
 
 	m_camera->Update(deltaTime);
 
