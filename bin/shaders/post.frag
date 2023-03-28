@@ -125,14 +125,16 @@ vec4 Scanlines(vec2 texCoord)
     float flickering = 0.003;
 
     vec4 texColour = texture(colourTarget,texCoord);
-
+    
     float count = windowHeight * density;
 
-    vec2 sl = vec2(sin(texCoord.y * count), cos(texCoord.y * count));
+    float scaledY = texCoord.y + time * .3f;
+
+    vec2 sl = vec2(sin(scaledY * count), cos(scaledY * count));
 	vec3 scanlines = vec3(sl.x, sl.y, sl.x);
 
     texColour.rgb += texColour.rgb * (scanlines * opacityScanline);
-    //texColour.rgb += texColour.rgb * vec3(random(texCoord * time)) * opacityNoise;
+    texColour.rgb += texColour.rgb * vec3(random(texCoord * time)) * opacityNoise;
     texColour.rgb += texColour.rgb * sin(110.0 * time) * flickering;
 
     return vec4(texColour);
