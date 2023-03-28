@@ -157,6 +157,7 @@ void ComputerGraphicsApp::draw()
 	m_postProcessShader.bindUniform("postProcessTarget", m_postProcessEffect);
 	m_postProcessShader.bindUniform("windowWidth", (int) getWindowWidth());
 	m_postProcessShader.bindUniform("windowHeight", (int) getWindowHeight());
+	m_postProcessShader.bindUniform("time", getTime());
 
 	m_renderTarget.getTarget(0).bind(0);
 

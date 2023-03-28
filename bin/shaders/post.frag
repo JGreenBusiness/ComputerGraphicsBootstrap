@@ -6,6 +6,7 @@ uniform sampler2D colourTarget;
 uniform int postProcessTarget;
 uniform int windowWidth;
 uniform int windowHeight;
+uniform float time;
 
 out vec4 FragColour;
 
@@ -103,6 +104,41 @@ vec4 GreyScale(vec2 texCoord)
     return vec4(gs, gs, gs, 1.0); 
 }
 
+vec4 Inverted(vec2 texCoord)
+{
+    vec4 texColour = texture(colourTarget,texCoord);
+
+    return vec4(1 - texColour.r , 1 - texColour.g ,1 -  texColour.b, 1.0); 
+}
+
+float random (vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))*
+        43758.5453123);
+}
+
+vec4 Scanlines(vec2 texCoord)
+{
+    float density = 30;
+    float opacityScanline = .3;
+    float opacityNoise = .2;
+    float flickering = 0.003;
+
+    vec4 texColour = texture(colourTarget,texCoord);
+
+    float count = windowHeight * density;
+
+    vec2 sl = vec2(sin(texCoord.y * count), cos(texCoord.y * count));
+	vec3 scanlines = vec3(sl.x, sl.y, sl.x);
+
+    texColour.rgb += texColour.rgb * (scanlines * opacityScanline);
+    //texColour.rgb += texColour.rgb * vec3(random(texCoord * time)) * opacityNoise;
+    texColour.rgb += texColour.rgb * sin(110.0 * time) * flickering;
+
+    return vec4(texColour);
+}
+
+
 void main()
 {
     // This will calculate the exel size
@@ -142,7 +178,7 @@ void main()
         } 
         case 4: // Scanlines
         { 
-            FragColour = Default(texCoord);
+            FragColour = Scanlines(texCoord);
             break;
         } 
         case 5: // Grey Scale
@@ -152,7 +188,7 @@ void main()
         } 
         case 6: // Invert
         { 
-            FragColour = Default(texCoord);
+            FragColour = Inverted(texCoord);
             break;
         } 
         case 7: // Pixelizer
