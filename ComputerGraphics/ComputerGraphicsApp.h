@@ -16,6 +16,8 @@
 #include "Instance.h"
 #include "RenderTarget.h"
 
+#include "ParticleEmitter.h"
+
 
 class ComputerGraphicsApp : public aie::Application {
 public:
@@ -78,6 +80,7 @@ protected:
 	aie::ShaderProgram	m_texturedShader;
 	aie::ShaderProgram	m_normalShader;
 	aie::ShaderProgram	m_postProcessShader;
+	aie::ShaderProgram	m_particleShader;
 
 	int m_postProcessEffect = 5;
 
@@ -107,35 +110,37 @@ protected:
     	
 	
 
-	aie::OBJMesh	m_bunnyMesh;
-	glm::mat4		m_bunnyTransform;
+	aie::OBJMesh		m_bunnyMesh;
+	glm::mat4			m_bunnyTransform;
 	
-	aie::OBJMesh	m_spearMesh;
-	glm::mat4		m_spearTransform;
+	aie::OBJMesh		m_spearMesh;
+	glm::mat4			m_spearTransform;
 	
-	aie::OBJMesh	m_gunMesh;
-	glm::mat4		m_gunTransform;
+	aie::OBJMesh		m_gunMesh;
+	glm::mat4			m_gunTransform;
 
 
-	glm::vec3		m_shapeRotAxis;
-	float			m_shapeRot;
+	glm::vec3			m_shapeRotAxis;
+	float				m_shapeRot;
 
-	glm::mat4		m_OBJTransform;
+	glm::mat4			m_OBJTransform;
 
 	SimpleCamera*		m_camera;
 	FlyCamera*			m_flyCamera;
 	StationaryCamera*	m_stillCamera;
 
-	bool m_enableFlyCam;
+	bool				m_enableFlyCam;
 
-	glm::vec3 m_camPos;
-	glm::vec3 m_camRot;
+	glm::vec3			m_camPos;
+	glm::vec3			m_camRot;
 
 	glm::vec3 m_ambientLight;
 	Light* m_mainLight;
 	Light* m_pointLight1;
 	Light* m_pointLight2;
 
+	ParticleEmitter*		m_emitter;
+	glm::mat4			m_particlemitTransform;
 
 };
 

@@ -42,16 +42,9 @@ glm::mat4 SimpleCamera::GetProjectionMatrix(float width, float height)
 
 glm::mat4 SimpleCamera::GetWorldTransform(glm::vec3 position, glm::vec3 eularAngles, glm::vec3 scale)
 {
-	glm::mat4 mat;
-	mat[0] = glm::vec4(		scale.x		, 0			, 0				,0);
-	mat[1] = glm::vec4(		0			, scale.y	, 0				,0);
-	mat[2] = glm::vec4(		0			, 0			, scale.z		,0);
-	mat[3] = glm::vec4(		position.x	, position.y, position.z	,1);
-
-	mat = glm::rotate(mat, glm::radians(eularAngles.z), glm::vec3(0, 0, 1));
-	mat = glm::rotate(mat, glm::radians(eularAngles.y), glm::vec3(0, 1, 0));
-	mat = glm::rotate(mat, glm::radians(eularAngles.x), glm::vec3(1, 0, 0));
-	return mat;
+	return glm::translate(glm::mat4(1), position)*
+		glm::rotate(glm::mat4(1),
+			glm::radians(eularAngles.z), glm::vec3(0, 0, 1));
 }
 
 void SimpleCamera::SetViewMatrix(glm::vec3 from, glm::vec3 to, glm::vec3 up)

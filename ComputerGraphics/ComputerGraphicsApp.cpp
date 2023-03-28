@@ -47,6 +47,10 @@ bool ComputerGraphicsApp::startup() {
 
 	m_ambientLight = { .5f,.5f,.5f };
 
+	m_emitter = new ParticleEmitter();
+	m_emitter->Initialise(1000,500,0.1f,1.0f,1.0f,5,1,0.1f,
+		glm::vec4(0,0,1,1), glm::vec4(0, 1, 0, 1));
+
 	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(), getWindowHeight()),
 		*m_mainLight, m_ambientLight);
 
@@ -83,7 +87,6 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	Gizmos::clear();
 
 
-	m_camera->Update(deltaTime);
 
 	// draw a simple grid with gizmos
 	vec4 white(1);
@@ -111,6 +114,13 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	m_scene->GetLight().direction =
 		glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2),0));
 
+	SimpleCamera* sc = m_camera;
+
+	m_emitter->Update(deltaTime, m_stillCamera->
+		GetWorldTransform(m_stillCamera->GetPosition(), glm::vec3(0), glm::vec3(1)));
+
+	m_camera->Update(deltaTime);
+
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -133,16 +143,21 @@ void ComputerGraphicsApp::draw()
 		getWindowHeight());
 
 	auto pv = m_projectionMatrix * m_viewMatrix ;
-	
+
 	m_scene->Draw();
+
+	m_particleShader.bind();
+	m_particleShader.bindUniform("ProjectionViewModel", pv * m_particlemitTransform);
+	m_emitter->Draw();
 
 	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_flyCamera->GetPosition());
 	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_stillCamera->GetPosition());
 	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_pointLight1->direction);
 	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_pointLight2->direction);
-
-
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
+	
+
+	
 
 	// Unbind the target to return to the backbuffer
 	m_renderTarget.unbind();
@@ -246,9 +261,26 @@ bool ComputerGraphicsApp::LaunchShaders()
 		printf("post shader Error: %s\n", m_postProcessShader.getLastError());
 		return false;
 	}
+
+	// Partical Shader shader
+	m_particleShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/particle.vert");
+	m_particleShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/particle.frag");
+	if (m_particleShader.link() == false)
+	{
+		printf("Particle Shader Error: %s\n", m_particleShader.getLastError());
+		return false;
+	}
 #pragma endregion
 
-
+	m_particlemitTransform =
+	{
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
+	};
 	
 	// used for loading in a simple quad
 	//if (!QuadLoader())
