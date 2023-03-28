@@ -116,8 +116,8 @@ void ComputerGraphicsApp::update(float deltaTime) {
 
 	SimpleCamera* sc = m_camera;
 
-	m_emitter->Update(deltaTime, m_stillCamera->
-		GetWorldTransform(m_stillCamera->GetPosition(), glm::vec3(0), glm::vec3(1)));
+	m_emitter->Update(deltaTime, sc->
+		GetWorldTransform(sc->GetPosition(), glm::vec3(0), glm::vec3(1)));
 
 	m_camera->Update(deltaTime);
 
