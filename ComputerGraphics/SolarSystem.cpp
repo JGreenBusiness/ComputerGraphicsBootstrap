@@ -27,6 +27,8 @@ bool SolarSystem::startup() {
 	m_viewMatrix = glm::lookAt(vec3(15), vec3(0), vec3(0, 1, 0));
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
+	m_camera.SetProjectionMatrix(45, getWindowWidth() / getWindowHeight(),0.1f, 10000.f);
+
 	const int PLANET_NUM = 8;
 	float planetSizes [PLANET_NUM] =
 	{
@@ -135,8 +137,7 @@ void SolarSystem::draw() {
 	clearScreen();
 
 	m_viewMatrix = m_camera.GetViewMatrix();
-	m_projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(),
-		getWindowHeight());
+	m_projectionMatrix = m_camera.GetProjectionMatrix();
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 }
 

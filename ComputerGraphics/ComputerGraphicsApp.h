@@ -82,7 +82,7 @@ protected:
 	aie::ShaderProgram	m_postProcessShader;
 	aie::ShaderProgram	m_particleShader;
 
-	int m_postProcessEffect = 5;
+	int m_postProcessEffect = -1;
 
 	aie::RenderTarget	m_renderTarget;
 

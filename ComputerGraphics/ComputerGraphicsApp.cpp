@@ -2,6 +2,7 @@
 #include "Gizmos.h"
 #include "Input.h"
 #include "imgui.h"
+#include <iostream>
 
 using glm::vec3;
 using glm::vec4;
@@ -29,18 +30,17 @@ bool ComputerGraphicsApp::startup() {
 	m_enableFlyCam = false;
 	m_camera = m_stillCamera;
 
-	m_camPos = glm::vec3(0, 0, 1);
+	m_camPos = glm::vec3(-20, 5, 0);
 	m_camRot = glm::vec3(0);
-	m_camera->SetPosition(m_camPos);
+	m_flyCamera->SetPosition(m_camPos);
+	m_stillCamera->SetPosition(m_camPos);
 
 
 	// create simple camera transforms
+	m_flyCamera->SetProjectionMatrix(45,getWindowWidth()/getWindowHeight(),0.1f,10000.f);
+	m_stillCamera->SetProjectionMatrix(45,getWindowWidth()/getWindowHeight(),0.1f,10000.f);
+	m_projectionMatrix = m_camera->GetProjectionMatrix();
 	m_viewMatrix = m_camera->GetViewMatrix();
-		//glm::lookAt(vec3(15), vec3(0), vec3(0, 1, 0));
-	m_projectionMatrix = m_camera->GetProjectionMatrix(getWindowWidth(),
-		getWindowHeight());
-		//glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
-
 
 
 	m_mainLight = new Light(glm::vec3(1,-1,1),glm::vec3(0),1);
@@ -48,9 +48,9 @@ bool ComputerGraphicsApp::startup() {
 	m_ambientLight = { .5f,.5f,.5f };
 
 	m_emitter = new ParticleEmitter();
-	m_emitter->Initialise(1000, 500, 0.1f, 1.0f,
+	m_emitter->Initialise(5000, 500, 0.1f, 1.0f,
 		1.0f, 5, 1, 0.1f,
-		glm::vec4(0,0,1,1), glm::vec4(0, 1, 0, 1));
+		glm::vec4(1,0,0,1), glm::vec4(1, 1, 0, 1));
 
 	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(), getWindowHeight()),
 		*m_mainLight, m_ambientLight);
@@ -115,12 +115,8 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	m_scene->GetLight().direction =
 		glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2),0));
 
-	SimpleCamera* sc = m_camera;
 
-	m_emitter->Update(deltaTime, sc->GetWorldTransform(m_camera->GetPosition(), glm::vec3(0), glm::vec3(1)));
-
-	m_camera->Update(deltaTime);
-
+	m_emitter->Update(deltaTime, m_camera->SetWorldTransform(m_camera->GetPosition(), glm::vec3(0), glm::vec3(1)));
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -138,9 +134,8 @@ void ComputerGraphicsApp::draw()
 	// wipe the screen to the background colour
 	clearScreen();
 
-	m_viewMatrix = m_camera->GetViewMatrix();
-	m_projectionMatrix = m_camera->GetProjectionMatrix(getWindowWidth(),
-		getWindowHeight());
+	m_viewMatrix = m_camera->SetViewMatrix();
+	m_projectionMatrix = m_camera->GetProjectionMatrix();
 
 	auto pv = m_projectionMatrix * m_viewMatrix ;
 
@@ -366,19 +361,22 @@ ImGui::InputInt("Post Effect Index",
 	&m_postProcessEffect);
 	ImGui::End();
 
+	ImGui::Begin("Particle Effects");
+	ImGui::DragFloat3("Patricle Position",
+		&m_particlemitTransform[3][0], .1f, -100, 100);
+	ImGui::End();
 
-	m_camPos = m_camera->GetPosition();
+
 	ImGui::Begin("Camera Settings");
 	ImGui::DragFloat3("Camera Pos",
-		&m_camPos[0], 1, 0, 1000);
+		&m_camPos[0], .1f, -1000, 1000);
 	ImGui::DragFloat3("Camera Rot",
-		&m_camRot[0], 1, -360, 360);
+		&m_camRot[0], 1.f, -1000, 1000);
 	ImGui::Checkbox("EnableFlyCam",
 		&m_enableFlyCam);
 	ImGui::End();
 
-	m_stillCamera->SetRotation(m_camRot);
-	m_camera->SetWorldTransform(m_camera->GetWorldTransform(m_camPos, glm::vec3(0), glm::vec3(1)));
+	m_stillCamera->SetWorldTransform(m_camPos,m_camRot,glm::vec3(1));
 
 	if (m_camera != m_flyCamera && m_enableFlyCam)
 	{

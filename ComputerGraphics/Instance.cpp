@@ -27,8 +27,7 @@ void Instance::Draw(Scene* scene)
 	m_shader->bind();
 
 	// Bind all relevant uniforms for our shaders
-	auto pvm = scene->GetCamera()->GetProjectionMatrix(
-		scene->GetWindowSize().x, scene->GetWindowSize().y)*
+	auto pvm = scene->GetCamera()->GetProjectionMatrix()*
 		scene->GetCamera()->GetViewMatrix()*m_transform;
 
 	// bind the transofrm using the one provided

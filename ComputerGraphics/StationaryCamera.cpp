@@ -10,6 +10,5 @@ StationaryCamera::~StationaryCamera()
 
 void StationaryCamera::SetRotation(glm::vec3 eularAngles)
 {
-	m_theta = eularAngles.y;
-	m_phi = eularAngles.x;
+	//m_worldTransoform = GetWorldTransform(GetPosition(), eularAngles, glm::vec3(1));
 }

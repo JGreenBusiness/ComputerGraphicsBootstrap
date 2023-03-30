@@ -1,48 +1,27 @@
 #include "SimpleCamera.h"
-#include <glm/ext.hpp>
 #include <Input.h>
 
 SimpleCamera::SimpleCamera()
 {
-	m_position = glm::vec3(-20, 5, 0);
-
-	m_projectionViewTransform = glm::mat4();
-	m_worldTransoform = glm::mat4();
-	m_viewTransoform = glm::mat4();
+	m_worldTransoform = glm::mat4(1);
+	m_viewMatrix = glm::mat4(1);
+	m_projectionMatrix = glm::mat4(1);
+	m_projectionViewMatrix = glm::mat4(1);
 
 	m_aspectRatio = 16.0f / 9.0f;
-
-	m_phi = 0;
-	m_theta = 0;
 }
 
 SimpleCamera::~SimpleCamera()
 {
 }
 
-glm::mat4 SimpleCamera::GetViewMatrix()
+void SimpleCamera::Update(float deltaTime)
 {
-	float thetaR = glm::radians(m_theta);
-	float phiR = glm::radians(m_phi);
-	glm::vec3 forward(glm::cos(phiR) * glm::cos(thetaR), glm::sin(phiR),
-		glm::cos(phiR)*glm::sin(thetaR));
-
-	return glm::lookAt(m_position,m_position + forward, glm::vec3(0,1,0));
 }
 
-glm::mat4 SimpleCamera::GetProjectionViewMatrix(float width, float height)
+glm::mat4 SimpleCamera::SetWorldTransform(glm::vec3 position, glm::vec3 eularAngles, glm::vec3 scale)
 {
-	return GetProjectionMatrix(width, height) * GetViewMatrix();
-}
-glm::mat4 SimpleCamera::GetProjectionMatrix(float width, float height)
-{
-	return glm::perspective(glm::pi<float>() * 0.25f, width / height,
-		0.1f, 10000.f);
-}
-
-glm::mat4 SimpleCamera::GetWorldTransform(glm::vec3 position, glm::vec3 eularAngles, glm::vec3 scale)
-{
-	return glm::translate(glm::mat4(1), position)
+	return m_worldTransoform = glm::translate(glm::mat4(1), position)
 		* glm::rotate(glm::mat4(1),
 			glm::radians(eularAngles.z), glm::vec3(0, 0, 1))
 		* glm::rotate(glm::mat4(1),
@@ -54,25 +33,26 @@ glm::mat4 SimpleCamera::GetWorldTransform(glm::vec3 position, glm::vec3 eularAng
 
 void SimpleCamera::SetViewMatrix(glm::vec3 from, glm::vec3 to, glm::vec3 up)
 {
-	float thetaR = glm::radians(m_theta);
-	float phiR = glm::radians(m_phi);
-	glm::vec3 forward(glm::cos(phiR) * glm::cos(thetaR), glm::sin(phiR),
-		glm::cos(phiR) * glm::sin(thetaR));
+	m_viewMatrix = glm::lookAt(from, to, up);
+}
 
-	m_viewTransoform = glm::lookAt(from, to, up);
+glm::mat4 SimpleCamera::SetViewMatrix()
+{
+	glm::vec3 pos = m_worldTransoform[3];
+
+	float x = atan2(-m_worldTransoform[1][2], m_worldTransoform[2][2]);
+	float cosY = sqrt(1 - m_worldTransoform[0][2]);
+	float y = atan2(m_worldTransoform[0][2], cosY);
+
+	float thetaR = x;
+	float phiR = y;
+	glm::vec3 forward(glm::cos(phiR) * glm::cos(thetaR), glm::sin(phiR),glm::cos(phiR) * glm::sin(thetaR));
+
+	return m_viewMatrix = glm::lookAt(pos, pos + glm::vec3(1,0,0), glm::vec3(0, 1, 0)) ;
 }
 
 void SimpleCamera::SetProjectionMatrix(float fieldOfView, float aspectRatio, float near, float far)
 {
-	glm::mat4 projMat = glm::perspective(fieldOfView, aspectRatio,near,far);
-	
-	m_projectionViewTransform = projMat * m_viewTransoform;
-}
-
-void SimpleCamera::SetProjectionMatrix(float fieldOfView, float width, float height, float near, float far)
-{
-	glm::mat4 projMat = glm::perspective(fieldOfView, width/height, near, far);
-
-	m_projectionViewTransform = projMat * m_viewTransoform;
+	m_projectionMatrix = glm::perspective(fieldOfView, aspectRatio, near, far);
 }
 
