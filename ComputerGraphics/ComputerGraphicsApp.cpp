@@ -60,9 +60,11 @@ bool ComputerGraphicsApp::startup() {
 	m_scene->AddPointLights(*m_pointLight1);
 	m_scene->AddPointLights(*m_pointLight2);
 
-	m_shapeRot = 0;
-	m_shapeRotAxis = glm::vec3(0,1,0);
-	
+	m_objEular = glm::vec3(0,1,0);
+	m_objPos = glm::vec3(0);
+	m_objScale = glm::vec3(1);
+	m_selectedInstance = 0;
+
 	m_isTextured = 0;
 
 	return LaunchShaders();
@@ -175,50 +177,7 @@ void ComputerGraphicsApp::draw()
 
 
 	m_fullScreenQuad.Draw();
-	
 
-	// Draws he quad setup in QuadLoader
-	//TexturedQuadDraw(pv * m_texturedQuadTransform);
-
-
-	// Draws he quad setup in QuadLoader
-	//QuadDraw(pv * m_quadTransform);
-		
-	//Draw the bunny up in BunnyLoader
-	//BunnyDraw(pv * m_bunnyTransform);
-
-	//Draws the spear with light texture
-	//OBJDraw(pv, m_spearTransform, m_spearMesh);
-
-
-	//OBJDraw(pv, m_gunTransform, m_gunMesh);
-
-
-	//PhongDraw(pv * m_spearTransform, m_spearTransform);
-
-
-	//glm::mat4& currentShape = m_spearTransform;
-	//if(m_shapeRotAxis != glm::vec3(0))
-	//{
-	//	currentShape = glm::rotate(currentShape,glm::radians(m_shapeRot),m_shapeRotAxis);
-	//}
-	// Draws the Box setup in BoxLoader
-	//SimpleDraw(pv * m_boxTransform, m_boxMesh);
-	
-	// Draws the Disk setup in DiskLoader
-	//SimpleDraw(pv * m_diskTransform, m_diskMesh);
-		
-	// Draws the Disk setup in DiskLoader
-	//SimpleDraw(pv * m_coneTransform, m_coneMesh);
-	
-	// Draws the Pyramid setup in PyramidLoader
-	//SimpleDraw(pv * m_pyramidTransform, m_pyramidMesh);
-
-	
-
-	//SpearDraw(pv * m_spearTransform);
-
-	
 }
 
 
@@ -275,38 +234,13 @@ bool ComputerGraphicsApp::LaunchShaders()
 		0,0,0,1
 	};
 	
-	// used for loading in a simple quad
-	//if (!QuadLoader())
-	//{
-	//	return false;
-	//}
-
-	//// used for loading in an OBJ bunny
-	//if (!BunnyLoader())
-	//{
-	//	return false;
-	//}
 
 	if (!BoxLoader())
 	{
 		return false;
 	}
 
-	//if (!DiskLoader())
-	//{
-	//	return false;
-	//}
 
-	//if (!PyramidLoader())
-	//{
-	//	return false;
-	//}
-	//
-	//if (!ConeLoader())
-	//{
-	//	return false;
-	//}
-	//	
 	if (!TexturedQuadLoader())
 	{
 		return false;
@@ -315,29 +249,46 @@ bool ComputerGraphicsApp::LaunchShaders()
 	// Create a full screen quad
 	m_fullScreenQuad.InitialiseFullscreenQuad();
 			
-	if (!SpearLoader())
+
+
+	if (!OBJLoader(m_spearMesh,m_spearTransform,10, "./soulspear/","soulspear.obj",true))
 	{
 		return false;
 	}
-			
-	/*if (!GunLoader())
+	
+	if (!OBJLoader(m_gunMesh,m_gunTransform,10, "./gun/","M1887.obj",true))
 	{
 		return false;
-	}*/
-	
-	//if (!OBJLoader(m_spearMesh, m_spearTransform,1.0f,
-	//	"./soulspear/", "soulspear.obj", false))
-	//{
-	//	return false;
-	//}
-
-	for (int i = 0; i < 10; i++)
-	{
-		m_scene->AddInstance(new Instance(glm::vec3(i*2,0,0),glm::vec3(0,i*30,0),
-			glm::vec3(1,1,1), &m_spearMesh, &m_normalShader));
 	}
 
+	if (!OBJLoader(m_bunnyMesh, m_bunnyTransform, 10, "./stanford/", "Bunny.obj", true))
+	{
+		return false;
+	}
+
+	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
+		glm::vec3(1), &m_spearMesh, &m_normalShader));
+
+	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
+		glm::vec3(15), &m_gunMesh, &m_normalShader));
 	
+	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
+		glm::vec3(.5f), &m_bunnyMesh, &m_normalShader));
+
+	for (int i = 0; i < m_instances.size(); i++)
+	{
+		Instance* inst = m_instances[i];
+		glm::vec3 scale =
+		{
+			inst->GetTransform()[0][0],
+			inst->GetTransform()[1][1],
+			inst->GetTransform()[2][2]
+		};
+
+		inst->SetTransform(glm::vec3(i * 5, 0, 0), glm::vec3(0, i * 30, 0), scale);
+		m_scene->AddInstance(inst);
+	}
+		
 
 	return true;
 }
@@ -346,17 +297,40 @@ void ComputerGraphicsApp::ImGUIRefresher()
 {
 	ImGui::Begin("Light Settings");
 	ImGui::DragFloat3("Global Light Colour", 
-		&m_mainLight->colour[0], 0.1f, 0, 1);
+		&m_scene->GetLights()[0].colour[0], 0.1f, 0, 1);
 	ImGui::DragFloat3("Glabal Light Direction",
-		&m_mainLight->direction[0],0.1f, 01,1);
+		&m_scene->GetLights()[0].direction[0],0.1f, 01,1);
 	ImGui::End();
+
 	
-ImGui::Begin("Box Rot Settings");
-	ImGui::DragFloat3("Box Rot Axis", 
-		&m_shapeRotAxis[0],0.1f,0,1);
-	ImGui::DragFloat("Box Rot",
-		&m_shapeRot,0.01f, -1.0f,1);
+
+	int instIndex = m_selectedInstance;
+ImGui::Begin("OBJ Transform Settings");
+	ImGui::InputInt("Transform Index",
+		&instIndex);
+	ImGui::DragFloat3("OBJ Position",
+		&m_objPos[0], .1f, -100, 100);
+	ImGui::DragFloat3("OBJ Rot", 
+		&m_objEular[0],0.1f,0,360);
+	ImGui::DragFloat3("OBJ Scale",
+		&m_objScale[0], 0.01f, 0, 10);
 	ImGui::End();
+
+	if (instIndex != m_selectedInstance && instIndex>0 && instIndex < m_instances.size())
+	{
+		m_selectedInstance = instIndex;
+
+		m_objPos = m_instances[m_selectedInstance]->GetTransform()[3];
+		m_objScale =
+		{
+			m_instances[m_selectedInstance]->GetTransform()[0][0],
+			m_instances[m_selectedInstance]->GetTransform()[1][1],
+			m_instances[m_selectedInstance]->GetTransform()[2][2]
+		};
+	}
+	m_instances[m_selectedInstance]->SetTransform(m_objPos, m_objEular, m_objScale);
+
+
 
 ImGui::Begin("Post Processing Effect");
 ImGui::InputInt("Post Effect Index",

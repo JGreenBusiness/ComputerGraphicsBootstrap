@@ -120,10 +120,14 @@ protected:
 	glm::mat4			m_gunTransform;
 
 
-	glm::vec3			m_shapeRotAxis;
-	float				m_shapeRot;
+	glm::vec3			m_objEular;
+	glm::vec3			m_objPos;
+	glm::vec3			m_objScale;
 
 	glm::mat4			m_OBJTransform;
+
+	int m_selectedInstance;
+	std::vector<Instance*> m_instances;
 
 	SimpleCamera*		m_camera;
 	FlyCamera*			m_flyCamera;
