@@ -8,6 +8,8 @@ SimpleCamera::SimpleCamera()
 	m_projectionMatrix = glm::mat4(1);
 	m_projectionViewMatrix = glm::mat4(1);
 
+	m_eularOrientation = glm::vec3(0);
+
 	m_aspectRatio = 16.0f / 9.0f;
 }
 
@@ -19,8 +21,15 @@ void SimpleCamera::Update(float deltaTime)
 {
 }
 
+
+void SimpleCamera::SetRotation(glm::vec3 eularAngles)
+{
+	SetWorldTransform(GetPosition(), eularAngles, glm::vec3(1));
+}
+
 glm::mat4 SimpleCamera::SetWorldTransform(glm::vec3 position, glm::vec3 eularAngles, glm::vec3 scale)
 {
+	m_eularOrientation = eularAngles;
 	return m_worldTransoform = glm::translate(glm::mat4(1), position)
 		* glm::rotate(glm::mat4(1),
 			glm::radians(eularAngles.z), glm::vec3(0, 0, 1))
@@ -45,4 +54,6 @@ void SimpleCamera::SetProjectionMatrix(float fieldOfView, float aspectRatio, flo
 {
 	m_projectionMatrix = glm::perspective(fieldOfView, aspectRatio, near, far);
 }
+
+
 

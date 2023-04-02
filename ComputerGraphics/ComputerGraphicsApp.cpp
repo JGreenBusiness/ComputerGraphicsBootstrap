@@ -31,9 +31,9 @@ bool ComputerGraphicsApp::startup() {
 	m_camera = m_stillCamera;
 
 	m_camPos = glm::vec3(-20, 5, 0);
-	m_camRot = glm::vec3(0);
-	m_flyCamera->SetPosition(m_camPos);
-	m_stillCamera->SetPosition(m_camPos);
+	m_camRot = glm::vec3(0,0,0);
+	m_flyCamera->Translate(m_camPos);
+	m_stillCamera->Translate(m_camPos);
 
 
 	// create simple camera transforms
@@ -117,7 +117,7 @@ void ComputerGraphicsApp::update(float deltaTime) {
 
 
 	m_camera->Update(deltaTime);
-	m_emitter->Update(deltaTime, m_camera->SetWorldTransform(m_camera->GetPosition(), glm::vec3(0), glm::vec3(1)));
+	m_emitter->Update(deltaTime, m_camera->SetWorldTransform(m_camera->GetPosition(),m_camera->GetEular(), glm::vec3(1)));
 
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
@@ -139,7 +139,7 @@ void ComputerGraphicsApp::draw()
 	m_viewMatrix = m_camera->SetViewMatrix();
 	m_projectionMatrix = m_camera->GetProjectionMatrix();
 
-	auto pv = m_projectionMatrix * m_viewMatrix  ;
+	auto pv = m_projectionMatrix * m_viewMatrix ;
 
 	m_scene->Draw();
 
@@ -373,12 +373,13 @@ ImGui::InputInt("Post Effect Index",
 	ImGui::DragFloat3("Camera Pos",
 		&m_camPos[0], .1f, -1000, 1000);
 	ImGui::DragFloat3("Camera Rot",
-		&m_camRot[0], 1.f, -1000, 1000);
+		&m_camRot[0], 1.f, -361, 361);
 	ImGui::Checkbox("EnableFlyCam",
 		&m_enableFlyCam);
 	ImGui::End();
 
-	m_stillCamera->SetWorldTransform(m_camPos,m_camRot,glm::vec3(1));
+
+	m_stillCamera->SetWorldTransform(m_camPos, m_camRot, glm::vec3(1));
 
 	if (m_camera != m_flyCamera && m_enableFlyCam)
 	{

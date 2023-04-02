@@ -8,7 +8,4 @@ StationaryCamera::~StationaryCamera()
 {
 }
 
-void StationaryCamera::SetRotation(glm::vec3 eularAngles)
-{
-	//m_worldTransoform = GetWorldTransform(GetPosition(), eularAngles, glm::vec3(1));
-}
+
