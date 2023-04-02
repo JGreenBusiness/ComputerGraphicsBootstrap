@@ -48,17 +48,21 @@ bool ComputerGraphicsApp::startup() {
 	m_ambientLight = { .5f,.5f,.5f };
 
 	m_emitter = new ParticleEmitter();
+	m_particleStartColour = glm::vec4(1, 0, 0, 1);
+	m_particleEndColour = glm::vec4(1, 1, 0, 1);
 	m_emitter->Initialise(5000, 500, 0.1f, 1.0f,
 		1.0f, 5, 1, 0.1f,
-		glm::vec4(1,0,0,1), glm::vec4(1, 1, 0, 1));
+		m_particleStartColour, m_particleEndColour);
 
 	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(), getWindowHeight()),
 		*m_mainLight, m_ambientLight);
 
 	m_pointLight1 = new Light(glm::vec3(5, 10, 0), glm::vec3(1, 0, 0), 20);
 	m_pointLight2 = new Light(glm::vec3(8, 10, 0), glm::vec3(0, 0, 1), 20);
+	m_pLightFigure8 = new Light(glm::vec3(12, 10, 0), glm::vec3(0, 1, 0), 20);
 	m_scene->AddPointLights(*m_pointLight1);
 	m_scene->AddPointLights(*m_pointLight2);
+	m_scene->AddPointLights(*m_pLightFigure8);
 
 	m_objEular = glm::vec3(0,1,0);
 	m_objPos = glm::vec3(0);
@@ -121,6 +125,15 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	m_camera->Update(deltaTime);
 	m_emitter->Update(deltaTime, m_camera->SetWorldTransform(m_camera->GetPosition(),m_camera->GetEular(), glm::vec3(1)));
 
+	float scale = 10 / (3 - cos(2 * time));
+	float x = scale * cos(time);
+	float z = scale * sin(2 * time) / 2;
+	m_pLightFigure8->direction.x = x;
+	m_pLightFigure8->direction.z = z;
+	m_pLightFigure8->colour.x = x * 2;
+	m_pLightFigure8->colour.z = z * 2;
+	m_scene->SetPointLight(m_pLightFigure8, 2);
+
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -147,7 +160,11 @@ void ComputerGraphicsApp::draw()
 
 	m_particleShader.bind();
 	m_particleShader.bindUniform("ProjectionViewModel", pv * m_particlemitTransform);
-	m_emitter->Draw();
+
+	if (m_enableEmitter)
+	{
+		m_emitter->Draw();
+	}
 
 	if (!m_enableFlyCam)
 	{
@@ -165,6 +182,9 @@ void ComputerGraphicsApp::draw()
 
 	Gizmos::addSphere(m_pointLight2->direction, .2, 15, 15,
 		glm::vec4(m_pointLight2->colour.x, m_pointLight2->colour.y, m_pointLight2->colour.z, 1));
+
+	Gizmos::addSphere(m_pLightFigure8->direction, .2, 15, 15,
+		glm::vec4(m_pLightFigure8->colour.x, m_pLightFigure8->colour.y, m_pLightFigure8->colour.z, 1));
 
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 	
@@ -310,17 +330,17 @@ void ComputerGraphicsApp::ImGUIRefresher()
 {
 	ImGui::Begin("Light Settings");
 	ImGui::DragFloat3("Point Light1 Colour", 
-		&m_pointLight1[0].colour[0], 0.1f, 0, 1);
+		&m_pointLight1[0].colour[0], 0.1f, 0, 100);
 	ImGui::DragFloat3("Point Light1 Direction",
 		&m_pointLight1[0].direction[0],0.1f, -100,100);
 	ImGui::DragFloat3("Point Light2 Colour", 
-		&m_pointLight2[0].colour[0], 0.1f, 0, 1);
+		&m_pointLight2[0].colour[0], 0.1f, 0, 100);
 	ImGui::DragFloat3("Point Light2 Direction",
 		&m_pointLight2[0].direction[0], 0.1f, -100, 100);
 	ImGui::End();
 
-	m_scene->GetPointLights()[0].colour = m_pointLight1->colour;
-	m_scene->GetPointLights()[1] = *m_pointLight2;
+	m_scene->SetPointLight(m_pointLight1, 0);
+	m_scene->SetPointLight(m_pointLight2, 1);
 	
 
 	int instIndex = m_selectedInstance;
@@ -357,10 +377,17 @@ ImGui::InputInt("Post Effect Index",
 	ImGui::End();
 
 	ImGui::Begin("Particle Effects");
+	ImGui::Checkbox("EnableEmitter",
+		&m_enableEmitter);
 	ImGui::DragFloat3("Patricle Position",
 		&m_particlemitTransform[3][0], .1f, -100, 100);
+	ImGui::DragFloat4("Start Colour",
+		&m_particleStartColour[0], 0.01f, 0, 1);
+	ImGui::DragFloat4("End Colour",
+		&m_particleEndColour[0], 0.01f, 0, 1);
 	ImGui::End();
 
+	m_emitter->SetColour(m_particleStartColour, m_particleEndColour);
 
 	ImGui::Begin("Camera Settings");
 	ImGui::DragFloat3("Camera Pos",

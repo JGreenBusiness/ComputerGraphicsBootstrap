@@ -44,6 +44,11 @@ public:
 	void Update(float _dt, const glm::mat4& _cameraTransform);
 	void Draw();
 
+	void SetColour(glm::vec4 startColour, glm::vec4 EndColour)
+	{
+		m_startColour = startColour; m_endColour = EndColour;
+	}
+
 
 
 protected:

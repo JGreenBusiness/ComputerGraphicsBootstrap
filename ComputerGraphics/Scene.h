@@ -50,6 +50,7 @@ public:
 	glm::vec3 GetAmbienColourLight() { return m_ambientLightColour; }
 	Light GetLight() { return m_light; }
 	std::vector<Light> GetLights() { return m_pointLights; }
+	void SetPointLight(Light* light, int index) { m_pointLights[index] = *light; }
 	int GetNumberOfLights() { return m_pointLights.size(); }
 	glm::vec3* GetPointLightPositions() { return &m_pointLightPositions[0];}
 	glm::vec3* GetPointLightColours() { return &m_pointLightColours[0];}

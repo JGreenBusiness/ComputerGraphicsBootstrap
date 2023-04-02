@@ -138,14 +138,18 @@ protected:
 	glm::vec3			m_camPos;
 	glm::vec3			m_camRot;
 
-	glm::vec3 m_ambientLight;
-	Light* m_mainLight;
+	glm::vec3			m_ambientLight;
+	Light*				m_mainLight;
 
-	Light* m_pointLight1;
-	Light* m_pointLight2;
+	Light*				m_pointLight1;
+	Light*				m_pointLight2;
+	Light*				m_pLightFigure8;
 
-	ParticleEmitter*		m_emitter;
-	glm::mat4				m_particlemitTransform;
+	ParticleEmitter*	m_emitter;
+	bool				m_enableEmitter;
+	glm::mat4			m_particlemitTransform;
+	glm::vec4			m_particleStartColour;
+	glm::vec4			m_particleEndColour;
 
 };
 

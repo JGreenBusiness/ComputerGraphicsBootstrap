@@ -158,6 +158,11 @@ void main()
             // Output post process effect here FragColor = Default(texCoord);
             FragColour = Default(texCoord);
         } 
+        case -1: // BoxBlur
+        { 
+            FragColour = Default(texCoord);
+            break;
+        } 
         case 0: // BoxBlur
         { 
             FragColour = BoxBlur(texCoord);
