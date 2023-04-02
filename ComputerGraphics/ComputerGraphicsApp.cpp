@@ -149,10 +149,23 @@ void ComputerGraphicsApp::draw()
 	m_particleShader.bindUniform("ProjectionViewModel", pv * m_particlemitTransform);
 	m_emitter->Draw();
 
-	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_flyCamera->GetPosition());
-	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_stillCamera->GetPosition());
-	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_pointLight1->direction);
-	DrawGizmo(pv, m_boxTransform, m_boxMesh, m_pointLight2->direction);
+	if (!m_enableFlyCam)
+	{
+		Gizmos::addCylinderFilled(m_flyCamera->GetPosition(),
+			.5f, .5f, 15, glm::vec4(1));
+	}
+	else
+	{
+		Gizmos::addCylinderFilled(m_stillCamera->GetPosition(),
+			.5f, .5f, 15, glm::vec4(1));
+	}
+
+	Gizmos::addSphere(m_pointLight1->direction, .2f, 15, 15,
+		glm::vec4(m_pointLight1->colour.x, m_pointLight1->colour.y, m_pointLight1->colour.z, 1));
+
+	Gizmos::addSphere(m_pointLight2->direction, .2, 15, 15,
+		glm::vec4(m_pointLight2->colour.x, m_pointLight2->colour.y, m_pointLight2->colour.z, 1));
+
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 	
 
@@ -285,7 +298,7 @@ bool ComputerGraphicsApp::LaunchShaders()
 			inst->GetTransform()[2][2]
 		};
 
-		inst->SetTransform(glm::vec3(i * 5, 0, 0), glm::vec3(0, i * 30, 0), scale);
+		inst->SetTransform(glm::vec3(i * 5, 5, 0), glm::vec3(0, i * 30, 0), scale);
 		m_scene->AddInstance(inst);
 	}
 		
@@ -296,12 +309,18 @@ bool ComputerGraphicsApp::LaunchShaders()
 void ComputerGraphicsApp::ImGUIRefresher()
 {
 	ImGui::Begin("Light Settings");
-	ImGui::DragFloat3("Global Light Colour", 
-		&m_scene->GetLights()[0].colour[0], 0.1f, 0, 1);
-	ImGui::DragFloat3("Glabal Light Direction",
-		&m_scene->GetLights()[0].direction[0],0.1f, 01,1);
+	ImGui::DragFloat3("Point Light1 Colour", 
+		&m_pointLight1[0].colour[0], 0.1f, 0, 1);
+	ImGui::DragFloat3("Point Light1 Direction",
+		&m_pointLight1[0].direction[0],0.1f, -100,100);
+	ImGui::DragFloat3("Point Light2 Colour", 
+		&m_pointLight2[0].colour[0], 0.1f, 0, 1);
+	ImGui::DragFloat3("Point Light2 Direction",
+		&m_pointLight2[0].direction[0], 0.1f, -100, 100);
 	ImGui::End();
 
+	m_scene->GetPointLights()[0].colour = m_pointLight1->colour;
+	m_scene->GetPointLights()[1] = *m_pointLight2;
 	
 
 	int instIndex = m_selectedInstance;

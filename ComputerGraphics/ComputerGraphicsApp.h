@@ -140,6 +140,7 @@ protected:
 
 	glm::vec3 m_ambientLight;
 	Light* m_mainLight;
+
 	Light* m_pointLight1;
 	Light* m_pointLight2;
 
