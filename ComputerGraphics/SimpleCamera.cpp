@@ -38,17 +38,7 @@ void SimpleCamera::SetViewMatrix(glm::vec3 from, glm::vec3 to, glm::vec3 up)
 
 glm::mat4 SimpleCamera::SetViewMatrix()
 {
-	glm::vec3 pos = m_worldTransoform[3];
-
-	float x = atan2(-m_worldTransoform[1][2], m_worldTransoform[2][2]);
-	float cosY = sqrt(1 - m_worldTransoform[0][2]);
-	float y = atan2(m_worldTransoform[0][2], cosY);
-
-	float thetaR = x;
-	float phiR = y;
-	glm::vec3 forward(glm::cos(phiR) * glm::cos(thetaR), glm::sin(phiR),glm::cos(phiR) * glm::sin(thetaR));
-
-	return m_viewMatrix = glm::lookAt(pos, pos + glm::vec3(1,0,0), glm::vec3(0, 1, 0)) ;
+	return m_viewMatrix = glm::lookAt(glm::vec3(0, 0, 0),glm::vec3(1,0,0), glm::vec3(0, 1, 0)) / m_worldTransoform;
 }
 
 void SimpleCamera::SetProjectionMatrix(float fieldOfView, float aspectRatio, float near, float far)

@@ -1,7 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-
 class SimpleCamera
 {
 public:
@@ -33,8 +32,6 @@ protected:
 	glm::mat4	m_viewMatrix;
 	glm::mat4	m_projectionMatrix;
 	glm::mat4	m_projectionViewMatrix;
-
-
 		
 	float		m_aspectRatio;
 

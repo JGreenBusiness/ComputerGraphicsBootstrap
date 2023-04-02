@@ -116,7 +116,9 @@ void ComputerGraphicsApp::update(float deltaTime) {
 		glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2),0));
 
 
+	m_camera->Update(deltaTime);
 	m_emitter->Update(deltaTime, m_camera->SetWorldTransform(m_camera->GetPosition(), glm::vec3(0), glm::vec3(1)));
+
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -137,7 +139,7 @@ void ComputerGraphicsApp::draw()
 	m_viewMatrix = m_camera->SetViewMatrix();
 	m_projectionMatrix = m_camera->GetProjectionMatrix();
 
-	auto pv = m_projectionMatrix * m_viewMatrix ;
+	auto pv = m_projectionMatrix * m_viewMatrix  ;
 
 	m_scene->Draw();
 
