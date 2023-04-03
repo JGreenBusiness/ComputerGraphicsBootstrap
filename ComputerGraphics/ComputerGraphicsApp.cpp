@@ -298,6 +298,14 @@ bool ComputerGraphicsApp::LaunchShaders()
 	{
 		return false;
 	}
+		
+			
+	if (!OBJLoader(m_houseMesh, m_houseTransform, 1, "./house/", "Buidling.obj", true))
+	{
+		return false;
+	}
+			
+
 
 	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
 		glm::vec3(1), &m_spearMesh, &m_normalShader));
@@ -307,6 +315,10 @@ bool ComputerGraphicsApp::LaunchShaders()
 	
 	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
 		glm::vec3(.5f), &m_bunnyMesh, &m_normalShader));
+	
+	
+	m_scene->AddInstance(new Instance(glm::vec3(0, 0.1f, 0), glm::vec3(0, 0, 0),
+		glm::vec3(10.f), &m_houseMesh, &m_normalShader));
 
 	for (int i = 0; i < m_instances.size(); i++)
 	{
@@ -318,7 +330,7 @@ bool ComputerGraphicsApp::LaunchShaders()
 			inst->GetTransform()[2][2]
 		};
 
-		inst->SetTransform(glm::vec3(i * 5, 5, 0), glm::vec3(0, i * 30, 0), scale);
+		inst->SetTransform(glm::vec3(i * 8, 5, 0), glm::vec3(0, i * 30, 0), scale);
 		m_scene->AddInstance(inst);
 	}
 		

@@ -118,6 +118,12 @@ protected:
 	
 	aie::OBJMesh		m_gunMesh;
 	glm::mat4			m_gunTransform;
+		
+	aie::OBJMesh		m_houseMesh;
+	glm::mat4			m_houseTransform;
+		
+	aie::OBJMesh		m_carMesh;
+	glm::mat4			m_carTransform;
 
 
 	glm::vec3			m_objEular;
