@@ -8,7 +8,11 @@ public:
 	~FlyCamera();
 
 	void Update(float deltaTime) override;
+
+	/// <summary> Sets speed for when user wants faster movement.</summary>
 	void SetFastSpeed(float speed) { m_cameraFastSpeed = speed; }
+
+	/// <summary> Sets the speed at which fly camera defaults to</summary>
 	void SetdefaultSpeed(float speed) { m_cameraDefaultSpeed = speed; }
 	glm::mat4 SetViewMatrix() override;
 

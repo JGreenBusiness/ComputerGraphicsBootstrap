@@ -44,7 +44,7 @@ void Instance::Draw(Scene* scene)
 		scene->GetPointLightColours());
 
 	//Bind the direction light we defind
-	m_shader->bindUniform("LightDirection", scene->GetLight().direction);
+	m_shader->bindUniform("LightDirection", scene->GetLight().position);
 	m_shader->bindUniform("LightColour", scene->GetLight().colour);
 	m_shader->bindUniform("AmbientColour", scene->GetAmbienColourLight());
 

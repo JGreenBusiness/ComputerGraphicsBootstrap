@@ -12,16 +12,16 @@ struct Light
 {
 	Light() 
 	{
-		direction = glm::vec3(0);
+		position = glm::vec3(0);
 		colour = glm::vec3(1);
 	}
 	Light(glm::vec3 _position, glm::vec3 _colour, float _intensity)
 	{
-		direction = _position;
+		position = _position;
 		colour = _colour * _intensity;
 	}
 
-	glm::vec3 direction;
+	glm::vec3 position;
 	glm::vec3 colour;
 
 
@@ -34,6 +34,7 @@ public:
 		Light& light, glm::vec3 ambientLightColour);
 	~Scene();
 
+	/// <summary> Adds an instance to the scene</summary>
 	void AddInstance(Instance* instance);
 
 	void Draw();
@@ -42,17 +43,22 @@ public:
 	{
 		m_pointLights.push_back(light);
 	}
-	void AddPointLights(glm::vec3 direction, glm::vec3 colour, float intensity)
-		{m_pointLights.push_back(Light(direction,colour, intensity));}
+	void AddPointLights(glm::vec3 position, glm::vec3 colour, float intensity)
+		{m_pointLights.push_back(Light(position,colour, intensity));}
+
+	void SetPointLight(int _index, Light _pointLight) { m_pointLights[_index] = _pointLight; }
 
 	SimpleCamera* GetCamera() { return m_camera; }
 	glm::vec2 GetWindowSize() { return m_windowSize; }
 	glm::vec3 GetAmbienColourLight() { return m_ambientLightColour; }
 	Light GetLight() { return m_light; }
 	std::vector<Light> GetLights() { return m_pointLights; }
-	void SetPointLight(Light* light, int index) { m_pointLights[index] = *light; }
 	int GetNumberOfLights() { return m_pointLights.size(); }
+
+	/// <summary> Returns read only positions of point lights</summary>
 	glm::vec3* GetPointLightPositions() { return &m_pointLightPositions[0];}
+
+	/// <summary> Returns read only colours of point lights</summary>
 	glm::vec3* GetPointLightColours() { return &m_pointLightColours[0];}
 
 	std::vector<Light> GetPointLights() { return m_pointLights; }

@@ -29,22 +29,10 @@ void Planetoid::Draw()
 void Planetoid::DrawOrbitingPlanet(float _time, float _speed, const glm::vec3& _axis)
 {
 	glm::mat4 mat = *m_transform;
-
-	//mat[0] = glm::vec4(1,0,0,0);
-	//mat[1] = glm::vec4(0,1,0,0);
-	//mat[2] = glm::vec4(0,0,1,0);
-	//mat[3] = glm::vec4(0,0,0,1);
-
-	//*m_transform = glm::translate(*m_transform * mat, glm::vec3(glm::sin(_time * _speed), 0, glm::cos(_time * _speed)));
-
-	
-
 	mat = RotAroundPoint(_time * _speed, glm::vec3(m_distFromSun,0,0), _axis);
 	*m_transform = mat;
 
-	//m_origin -= glm::vec3(m_distFromSun, 0, 0);
 	aie::Gizmos::addSphere(m_origin, m_radius, 15, 15, m_colour, &*m_transform);
-	//m_origin += glm::vec3(m_distFromSun, 0, 0);
 
 }
 

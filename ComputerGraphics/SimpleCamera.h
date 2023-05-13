@@ -11,6 +11,8 @@ public:
 
 	// Getters
 	glm::vec3 GetPosition(){ return (glm::vec3)m_worldTransoform[3]; }
+
+	/// <summary> Returns eular angle orientation </summary>
 	glm::vec3 GetEular() { return m_eularOrientation; };
 	glm::mat4 GetWorldTransform() { return m_worldTransoform; };
 	glm::mat4 GetProjectionMatrix() { return m_projectionMatrix; }
@@ -19,7 +21,11 @@ public:
 	float GetAspectRatio() { return m_aspectRatio; }
 
 	// Setters
+	
+	/// <summary> Translates Camera's world transform</summary>
 	void Translate(glm::vec3 pos) { m_worldTransoform = glm::translate(m_worldTransoform,pos); }
+	
+	/// <summary> Sets rotation using eular angles.</summary>
 	void SetRotation(glm::vec3 eularAngles);
 	void SetAspectRatio(float width, float height) { m_aspectRatio = width / height; }
 	void SetWorldTransform(glm::mat4 _transform) {m_worldTransoform = _transform;}

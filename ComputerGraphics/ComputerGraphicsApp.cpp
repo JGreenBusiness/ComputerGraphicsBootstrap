@@ -24,7 +24,7 @@ bool ComputerGraphicsApp::startup() {
 	// initialise gizmo primitive counts
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-
+	// Sets cameras
 	m_flyCamera = new FlyCamera();
 	m_stillCamera = new StationaryCamera();
 	m_enableFlyCam = false;
@@ -42,28 +42,27 @@ bool ComputerGraphicsApp::startup() {
 	m_projectionMatrix = m_camera->GetProjectionMatrix();
 	m_viewMatrix = m_camera->GetViewMatrix();
 
-
+	// Sets main and ambient lighting
 	m_mainLight = new Light(glm::vec3(1,-1,1),glm::vec3(0),1);
-
 	m_ambientLight = { .5f,.5f,.5f };
 
+	// Initialises paticle emmiter
 	m_emitter = new ParticleEmitter();
-	m_particleStartColour = glm::vec4(1, 0, 0, 1);
-	m_particleEndColour = glm::vec4(1, 1, 0, 1);
 	m_emitter->Initialise(5000, 500, 0.1f, 1.0f,
 		1.0f, 5, 1, 0.1f,
-		m_particleStartColour, m_particleEndColour);
+		glm::vec4(1,0,0,1), glm::vec4(1, 1, 0, 1));
 
+	// Initialises scene with main and ambient lighting
 	m_scene = new Scene(m_camera, glm::vec2(getWindowWidth(), getWindowHeight()),
 		*m_mainLight, m_ambientLight);
 
+	// Initialises point lights an adds them to the scene
 	m_pointLight1 = new Light(glm::vec3(5, 10, 0), glm::vec3(1, 0, 0), 20);
 	m_pointLight2 = new Light(glm::vec3(8, 10, 0), glm::vec3(0, 0, 1), 20);
-	m_pLightFigure8 = new Light(glm::vec3(12, 10, 0), glm::vec3(0, 1, 0), 20);
 	m_scene->AddPointLights(*m_pointLight1);
 	m_scene->AddPointLights(*m_pointLight2);
-	m_scene->AddPointLights(*m_pLightFigure8);
 
+	// sets current object's orientation and postion
 	m_objEular = glm::vec3(0,1,0);
 	m_objPos = glm::vec3(0);
 	m_objScale = glm::vec3(1);
@@ -118,21 +117,12 @@ void ComputerGraphicsApp::update(float deltaTime) {
 	float time = getTime();
 
 	// Rotate the light to emulate a 'day/night' cycle
-	m_scene->GetLight().direction =
+	m_scene->GetLight().position =
 		glm::normalize(glm::vec3(glm::cos(time * 2), glm::sin(time * 2),0));
 
-
+	// Updates camera and emitter
 	m_camera->Update(deltaTime);
 	m_emitter->Update(deltaTime, m_camera->SetWorldTransform(m_camera->GetPosition(),m_camera->GetEular(), glm::vec3(1)));
-
-	float scale = 10 / (3 - cos(2 * time));
-	float x = scale * cos(time);
-	float z = scale * sin(2 * time) / 2;
-	m_pLightFigure8->direction.x = x;
-	m_pLightFigure8->direction.z = z;
-	m_pLightFigure8->colour.x = x * 2;
-	m_pLightFigure8->colour.z = z * 2;
-	m_scene->SetPointLight(m_pLightFigure8, 2);
 
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
@@ -160,12 +150,9 @@ void ComputerGraphicsApp::draw()
 
 	m_particleShader.bind();
 	m_particleShader.bindUniform("ProjectionViewModel", pv * m_particlemitTransform);
+	m_emitter->Draw();
 
-	if (m_enableEmitter)
-	{
-		m_emitter->Draw();
-	}
-
+	// Draws a filled cylinder if user is not using the camera
 	if (!m_enableFlyCam)
 	{
 		Gizmos::addCylinderFilled(m_flyCamera->GetPosition(),
@@ -177,19 +164,14 @@ void ComputerGraphicsApp::draw()
 			.5f, .5f, 15, glm::vec4(1));
 	}
 
-	Gizmos::addSphere(m_pointLight1->direction, .2f, 15, 15,
+	// Draws circles on point lights with the colour of the lighting
+	Gizmos::addSphere(m_pointLight1->position, .2f, 15, 15,
 		glm::vec4(m_pointLight1->colour.x, m_pointLight1->colour.y, m_pointLight1->colour.z, 1));
-
-	Gizmos::addSphere(m_pointLight2->direction, .2, 15, 15,
+	Gizmos::addSphere(m_pointLight2->position, .2, 15, 15,
 		glm::vec4(m_pointLight2->colour.x, m_pointLight2->colour.y, m_pointLight2->colour.z, 1));
 
-	Gizmos::addSphere(m_pLightFigure8->direction, .2, 15, 15,
-		glm::vec4(m_pLightFigure8->colour.x, m_pLightFigure8->colour.y, m_pLightFigure8->colour.z, 1));
-
+	// Draws gizmos
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
-	
-
-	
 
 	// Unbind the target to return to the backbuffer
 	m_renderTarget.unbind();
@@ -298,14 +280,6 @@ bool ComputerGraphicsApp::LaunchShaders()
 	{
 		return false;
 	}
-		
-			
-	if (!OBJLoader(m_houseMesh, m_houseTransform, 1, "./house/", "Buidling.obj", true))
-	{
-		return false;
-	}
-			
-
 
 	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
 		glm::vec3(1), &m_spearMesh, &m_normalShader));
@@ -315,10 +289,6 @@ bool ComputerGraphicsApp::LaunchShaders()
 	
 	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
 		glm::vec3(.5f), &m_bunnyMesh, &m_normalShader));
-	
-	
-	m_scene->AddInstance(new Instance(glm::vec3(0, 0.1f, 0), glm::vec3(0, 0, 0),
-		glm::vec3(10.f), &m_houseMesh, &m_normalShader));
 
 	for (int i = 0; i < m_instances.size(); i++)
 	{
@@ -330,7 +300,7 @@ bool ComputerGraphicsApp::LaunchShaders()
 			inst->GetTransform()[2][2]
 		};
 
-		inst->SetTransform(glm::vec3(i * 8, 5, 0), glm::vec3(0, i * 30, 0), scale);
+		inst->SetTransform(glm::vec3(i * 5, 5, 0), glm::vec3(0, i * 30, 0), scale);
 		m_scene->AddInstance(inst);
 	}
 		
@@ -342,19 +312,18 @@ void ComputerGraphicsApp::ImGUIRefresher()
 {
 	ImGui::Begin("Light Settings");
 	ImGui::DragFloat3("Point Light1 Colour", 
-		&m_pointLight1[0].colour[0], 0.1f, 0, 100);
-	ImGui::DragFloat3("Point Light1 Direction",
-		&m_pointLight1[0].direction[0],0.1f, -100,100);
+		&m_pointLight1[0].colour[0], 0.1f, 0, 20);
+	ImGui::DragFloat3("Point Light1 Position",
+		&m_pointLight1[0].position[0],0.1f, -100,100);
 	ImGui::DragFloat3("Point Light2 Colour", 
-		&m_pointLight2[0].colour[0], 0.1f, 0, 100);
-	ImGui::DragFloat3("Point Light2 Direction",
-		&m_pointLight2[0].direction[0], 0.1f, -100, 100);
+		&m_pointLight2[0].colour[0], 0.1f, 0, 20);
+	ImGui::DragFloat3("Point Light2 Position",
+		&m_pointLight2[0].position[0], 0.1f, -100, 100);
 	ImGui::End();
 
-	m_scene->SetPointLight(m_pointLight1, 0);
-	m_scene->SetPointLight(m_pointLight2, 1);
+	m_scene->SetPointLight(0, *m_pointLight1);
+	m_scene->SetPointLight(1, *m_pointLight2);
 	
-
 	int instIndex = m_selectedInstance;
 ImGui::Begin("OBJ Transform Settings");
 	ImGui::InputInt("Transform Index",
@@ -367,7 +336,7 @@ ImGui::Begin("OBJ Transform Settings");
 		&m_objScale[0], 0.01f, 0, 10);
 	ImGui::End();
 
-	if (instIndex != m_selectedInstance && instIndex>0 && instIndex < m_instances.size())
+	if (instIndex != m_selectedInstance && instIndex>=0 && instIndex < m_instances.size())
 	{
 		m_selectedInstance = instIndex;
 
@@ -389,17 +358,10 @@ ImGui::InputInt("Post Effect Index",
 	ImGui::End();
 
 	ImGui::Begin("Particle Effects");
-	ImGui::Checkbox("EnableEmitter",
-		&m_enableEmitter);
 	ImGui::DragFloat3("Patricle Position",
 		&m_particlemitTransform[3][0], .1f, -100, 100);
-	ImGui::DragFloat4("Start Colour",
-		&m_particleStartColour[0], 0.01f, 0, 1);
-	ImGui::DragFloat4("End Colour",
-		&m_particleEndColour[0], 0.01f, 0, 1);
 	ImGui::End();
 
-	m_emitter->SetColour(m_particleStartColour, m_particleEndColour);
 
 	ImGui::Begin("Camera Settings");
 	ImGui::DragFloat3("Camera Pos",
@@ -412,7 +374,8 @@ ImGui::InputInt("Post Effect Index",
 
 
 	m_stillCamera->SetWorldTransform(m_camPos, m_camRot, glm::vec3(1));
-
+	
+	// Sets the current camera to either the fly camera or the stationary camera
 	if (m_camera != m_flyCamera && m_enableFlyCam)
 	{
 		m_camera = m_flyCamera;
@@ -880,7 +843,7 @@ void ComputerGraphicsApp::OBJDraw(glm::mat4& pv, glm::mat4& transform, aie::OBJM
 		glm::vec3(m_viewMatrix[3]));
 
 	//Bind the direction light we defind
-	m_normalShader.bindUniform("LightDirection", m_scene->GetLight().direction);
+	m_normalShader.bindUniform("LightDirection", m_scene->GetLight().position);
 	m_normalShader.bindUniform("AmbientColour", m_ambientLight);
 	m_normalShader.bindUniform("LightColour", m_scene->GetLight().colour);
 
@@ -946,7 +909,7 @@ void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform)
 		glm::vec3(glm::inverse(m_viewMatrix)[3]));
 
 	//Bind the direction light we defind
-	m_phongShader.bindUniform("LightDirection", m_scene->GetLight().direction);
+	m_phongShader.bindUniform("LightDirection", m_scene->GetLight().position);
 	m_phongShader.bindUniform("AmbientColour", m_ambientLight);
 	m_phongShader.bindUniform("LightColour", m_scene->GetLight().colour);
 
@@ -969,7 +932,7 @@ void ComputerGraphicsApp::PhongDraw(glm::mat4 pvm, glm::mat4 transform, Mesh& me
 		glm::vec3(glm::inverse(m_viewMatrix)[3]));
 
 	//Bind the direction light we defind
-	m_phongShader.bindUniform("LightDirection", m_scene->GetLight().direction);
+	m_phongShader.bindUniform("LightDirection", m_scene->GetLight().position);
 	m_phongShader.bindUniform("AmbientColour", m_ambientLight);
 	m_phongShader.bindUniform("LightColour", m_scene->GetLight().colour);
 

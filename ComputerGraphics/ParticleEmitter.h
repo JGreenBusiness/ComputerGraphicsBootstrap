@@ -33,6 +33,8 @@ public:
 		const glm::vec4& _endColour);
 	virtual ~ParticleEmitter();
 
+
+	/// <summary> Initialises particle effect.</summary>
 	void Initialise(unsigned int _maxParticles, unsigned int _emmitRate,
 		float _lifetimeMin, float _lifetimeMax,
 		float _velocityMin, float _velocityMax,
@@ -40,14 +42,11 @@ public:
 		const glm::vec4& _startcolour,
 		const glm::vec4& _endColour);
 
+	/// <summary> Emit's particle effect.</summary>
 	void Emit();
+
 	void Update(float _dt, const glm::mat4& _cameraTransform);
 	void Draw();
-
-	void SetColour(glm::vec4 startColour, glm::vec4 EndColour)
-	{
-		m_startColour = startColour; m_endColour = EndColour;
-	}
 
 
 
