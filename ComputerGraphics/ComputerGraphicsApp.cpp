@@ -133,24 +133,16 @@ void ComputerGraphicsApp::update(float deltaTime) {
 
 void ComputerGraphicsApp::draw()
 {
-	// Bind the render target as the first 
-	// part of our draw function
-	m_renderTarget.bind();
-
 
 	// wipe the screen to the background colour
 	clearScreen();
 
 	m_viewMatrix = m_camera->SetViewMatrix();
-	m_projectionMatrix = m_camera->GetProjectionMatrix();
+	m_projectionMatrix = m_camera->
+		LegacyGetProjectionMatrix(getWindowWidth(),getWindowHeight());
 
 	auto pv = m_projectionMatrix * m_viewMatrix ;
 
-	m_scene->Draw();
-
-	m_particleShader.bind();
-	m_particleShader.bindUniform("ProjectionViewModel", pv * m_particlemitTransform);
-	m_emitter->Draw();
 
 	// Draws a filled cylinder if user is not using the camera
 	if (!m_enableFlyCam)
@@ -170,29 +162,9 @@ void ComputerGraphicsApp::draw()
 	Gizmos::addSphere(m_pointLight2->position, .2, 15, 15,
 		glm::vec4(m_pointLight2->colour.x, m_pointLight2->colour.y, m_pointLight2->colour.z, 1));
 
-	// Draws gizmos
+
+	m_scene->Draw();
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
-
-	// Unbind the target to return to the backbuffer
-	m_renderTarget.unbind();
-
-	clearScreen();
-
-	
-
-	// Bind Post Processing Shader and the texture
-	m_postProcessShader.bind();
-	m_postProcessShader.bindUniform("colourTarget",0);
-	m_postProcessShader.bindUniform("postProcessTarget", m_postProcessEffect);
-	m_postProcessShader.bindUniform("windowWidth", (int) getWindowWidth());
-	m_postProcessShader.bindUniform("windowHeight", (int) getWindowHeight());
-	m_postProcessShader.bindUniform("time", getTime());
-
-	m_renderTarget.getTarget(0).bind(0);
-
-
-	m_fullScreenQuad.Draw();
-
 }
 
 

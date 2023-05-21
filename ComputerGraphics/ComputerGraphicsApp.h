@@ -90,7 +90,6 @@ protected:
 	/// <summary> Initialises textured shader and loads and draws a quad mesh.</summary>
 	void TexturedQuadDraw(glm::mat4 pvm);
 
-
 	/// <summary> Initialises and draws a mesh with a simple shader.</summary>
 	void DrawGizmo(glm::mat4 projectionView, glm::mat4 transform, Mesh& gizmoMesh,
 		glm::vec3 position);
