@@ -253,13 +253,13 @@ bool ComputerGraphicsApp::LaunchShaders()
 		return false;
 	}
 
-	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
+	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 0, 0),
 		glm::vec3(1), &m_spearMesh, &m_normalShader));
 
-	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
-		glm::vec3(15), &m_gunMesh, &m_normalShader));
+	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 0, 0),
+		glm::vec3(10.f), &m_gunMesh, &m_normalShader));
 	
-	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 30, 0),
+	m_instances.push_back(new Instance(glm::vec3(2, 0, 0), glm::vec3(0, 0, 0),
 		glm::vec3(.5f), &m_bunnyMesh, &m_normalShader));
 
 	for (int i = 0; i < m_instances.size(); i++)
@@ -272,7 +272,7 @@ bool ComputerGraphicsApp::LaunchShaders()
 			inst->GetTransform()[2][2]
 		};
 
-		inst->SetTransform(glm::vec3(i * 5, 5, 0), glm::vec3(0, i * 30, 0), scale);
+		inst->SetTransform(glm::vec3(i * 5, 5, 0), glm::vec3(0), scale);
 		m_scene->AddInstance(inst);
 	}
 		
@@ -324,22 +324,10 @@ ImGui::Begin("OBJ Transform Settings");
 
 
 
-ImGui::Begin("Post Processing Effect");
-ImGui::InputInt("Post Effect Index",
-	&m_postProcessEffect);
-	ImGui::End();
-
-	ImGui::Begin("Particle Effects");
-	ImGui::DragFloat3("Patricle Position",
-		&m_particlemitTransform[3][0], .1f, -100, 100);
-	ImGui::End();
-
 
 	ImGui::Begin("Camera Settings");
 	ImGui::DragFloat3("Camera Pos",
 		&m_camPos[0], .1f, -1000, 1000);
-	ImGui::DragFloat3("Camera Rot",
-		&m_camRot[0], 1.f, -361, 361);
 	ImGui::Checkbox("EnableFlyCam",
 		&m_enableFlyCam);
 	ImGui::End();
