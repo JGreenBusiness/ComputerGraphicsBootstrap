@@ -34,6 +34,10 @@ public:
 	virtual glm::mat4 SetViewMatrix();
 	void SetProjectionMatrix(float feildOfView, float aspectRatio,float near, float far);
 
+	// Legacy Functions
+	glm::mat4 LegacyGetProjectionMatrix(float width, float height);
+	glm::mat4 LegacyGetViewMatrix();
+
 
 protected:
 	glm::mat4	m_worldTransoform;

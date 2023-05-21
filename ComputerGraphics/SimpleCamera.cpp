@@ -55,5 +55,23 @@ void SimpleCamera::SetProjectionMatrix(float fieldOfView, float aspectRatio, flo
 	m_projectionMatrix = glm::perspective(fieldOfView, aspectRatio, near, far);
 }
 
+glm::mat4 SimpleCamera::LegacyGetProjectionMatrix(float width, float height)
+{
+	return m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, width / height,
+		0.1f, 10000.f);
+}
+
+glm::mat4 SimpleCamera::LegacyGetViewMatrix()
+{
+	float thetaR = m_eularOrientation.x;
+	float phiR = m_eularOrientation.y;
+	glm::vec3 forward(glm::cos(phiR) * glm::cos(thetaR), glm::sin(phiR),
+		glm::cos(phiR) * glm::sin(thetaR));
+
+	glm::vec3 pos = m_worldTransoform[3];
+
+	return m_viewMatrix = glm::lookAt(pos, pos + forward, glm::vec3(0, 1, 0));
+}
+
 
 
