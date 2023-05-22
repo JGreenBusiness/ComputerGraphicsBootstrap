@@ -57,8 +57,8 @@ bool ComputerGraphicsApp::startup() {
 		*m_mainLight, m_ambientLight);
 
 	// Initialises point lights an adds them to the scene
-	m_pointLight1 = new Light(glm::vec3(5, 10, 0), glm::vec3(1, 0, 0), 20);
-	m_pointLight2 = new Light(glm::vec3(8, 10, 0), glm::vec3(0, 0, 1), 20);
+	m_pointLight1 = new Light(glm::vec3(3, 8.f, 0), glm::vec3(1, 0, 0), 12.f);
+	m_pointLight2 = new Light(glm::vec3(1, 6.5f, 0), glm::vec3(0, 0, 1), 12.f);
 	m_scene->AddPointLights(*m_pointLight1);
 	m_scene->AddPointLights(*m_pointLight2);
 
@@ -302,8 +302,6 @@ ImGui::Begin("OBJ Transform Settings");
 		&instIndex);
 	ImGui::DragFloat3("OBJ Position",
 		&m_objPos[0], .1f, -100, 100);
-	ImGui::DragFloat3("OBJ Rot", 
-		&m_objEular[0],0.1f,0,360);
 	ImGui::DragFloat3("OBJ Scale",
 		&m_objScale[0], 0.01f, 0, 10);
 	ImGui::End();
@@ -328,6 +326,8 @@ ImGui::Begin("OBJ Transform Settings");
 	ImGui::Begin("Camera Settings");
 	ImGui::DragFloat3("Camera Pos",
 		&m_camPos[0], .1f, -1000, 1000);
+	ImGui::DragFloat("Camera Rot",
+		&m_camRot.y, .1f, -1000, 1000);
 	ImGui::Checkbox("EnableFlyCam",
 		&m_enableFlyCam);
 	ImGui::End();
